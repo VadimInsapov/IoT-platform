@@ -53,7 +53,7 @@ let  a = {
 
 const sendPostRequest = async () => {
     try {
-        const resp = await axios.post('http://localhost:4041/device', motionInfo());
+        const resp = await axios.post('http://localhost:4041/devices', motionInfo());
         console.log(resp.data);
     } catch (err) {
         console.error(err);
