@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "iot-agent": "node server/iot-agent.js",
+    "iot-agent": "node iot-agent.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
