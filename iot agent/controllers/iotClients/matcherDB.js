@@ -1,22 +1,17 @@
-const Device = require("../../models/device.js");
-const util = require('util');
-
-exports.matchFromDevicesAndSendDataToDB = (topic, message) => {
-    const deviceId = topic.split('/')[1];
-    const mqttAttributes = parseMessage(message);
-
-
+const Device = require("../../models/device");
+const util = require("util");
+exports.matchDevicesAndGetObjectForDB = (deviceId, clientAttributes) => {
     //добавить проверку нашли, не нашли
-
     const device = Device.find(deviceId);
     // console.log(device);
     const brokerId = device.entityName;
-    const brokerNewAttributes = getObjectWithNewAttributes(mqttAttributes, device.attributes);
+    const brokerNewAttributes = getObjectWithNewAttributes(clientAttributes, device.attributes);
     //к преобразованию типа подготовить
-    console.log(`меняем ${brokerId}, его новые атрибуты: ${util.inspect(brokerNewAttributes, false, null, true)}!`)
-    // sendNewMeasure(a);
+    return {
+        id: brokerId,
+        attributes: brokerNewAttributes,
+    };
 }
-
 const getObjectWithNewAttributes = (mqttAttributes, deviceAttributes) => {
     let brokerNewAttributes = {};
     for (const mqttAttr in mqttAttributes) {
@@ -28,4 +23,3 @@ const getObjectWithNewAttributes = (mqttAttributes, deviceAttributes) => {
     }
     return brokerNewAttributes;
 }
-const parseMessage = (message) => JSON.parse(message);

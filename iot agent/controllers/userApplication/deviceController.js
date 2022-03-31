@@ -12,13 +12,10 @@ exports.addDevice = function (mqttClient) {
         //добавить в бд
         if (protocol === "MQTT") {
             mqttClient.subscribe("/" + deviceId + "/attrs");
-            const device = new Device(deviceId, entityName, dynamicAttributes);
-            device.save();
-            console.log(util.inspect(Device.getAll(), false, null, true))
         }
-        if (protocol === "HTTP") {
-
-        }
+        const device = new Device(deviceId, entityName, dynamicAttributes);
+        device.save();
+        console.log(util.inspect(Device.getAll(), false, null, true))
         // сделать ответ response
     }
 };
