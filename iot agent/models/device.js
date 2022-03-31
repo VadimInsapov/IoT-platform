@@ -1,31 +1,40 @@
 const devices = new Map();
 
-module.exports = class Device{
-    constructor(deviceId, dynamic_attributes){
-        this.deviceId = deviceId;
-        this.attributes = new ValueForDevices(dynamic_attributes);
+module.exports = class Device {
+    constructor(deviceId, entityName, dynamicAttributes) {
+        this.key = deviceId;
+        this.value = this.getValueForDevices(entityName, dynamicAttributes);
     }
-    save(){
-        devices.set(this.deviceId, this.attributes);
+
+    static find(deviceId) {
+        return devices.get(deviceId);
     }
-    static getAll(){
+
+    save() {
+        devices.set(this.key, this.value);
+    }
+
+    static getAll() {
         return devices;
     }
-}
-function ValueForDevices(dynamic_attributes) {
-    this["entity_name"] = "broker:Motion:001";
-    let attributes = dynamic_attributes.reduce((attributes, currentValue) => {
-        attributes[currentValue.object_id] = {
-            type: currentValue.type,
-            name: currentValue.name,
-        }
-        return attributes;
-    }, {});
-    this["attributes"] = attributes;
+
+    getValueForDevices(entityName, dynamicAttributes) {
+        let a = {};
+        a["entityName"] = entityName;
+        let attributes = dynamicAttributes.reduce((attributes, currentValue) => {
+            attributes[currentValue.object_id] = {
+                type: currentValue.type,
+                name: currentValue.name,
+            }
+            return attributes;
+        }, {});
+        a["attributes"] = attributes;
+        return a;
+    }
 }
 // let a = {
 //     "motion001": {
-//         entity_name: "broker:Motion:001",
+//         entityName: "broker:Motion:001",
 //         attributes: {
 //             c: {
 //                 type: "number",
