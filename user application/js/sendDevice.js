@@ -2,54 +2,39 @@ const axios = require('axios').default;
 
 function getInfoFromUser() {
     return {
-        "MAC_address": "motion001",
+        "MAC_address": "mac:thermometer001",
     }
 }
-
 
 let motionInfo = () => {
     const infoFromUser = getInfoFromUser();
     const device_id = infoFromUser.MAC_address;
     return {
-        "device_id": "motion001",
+        "device_id": "mac:thermometer001",
         "entity_name": "broker:Motion:001",
-        "entity_type": "Motion",
+        "entity_type": "Thermometer001",
         "transport": "MQTT",
-        "attributes": [
+        "dynamic_attributes": [
             {
-                "type": "Integer",
-                "object_id": "c",
-                "name": "count"
-            }
+                "type": "number",
+                "object_id": "h",
+                "name": "humidity"
+            },
+            {
+                "type": "number",
+                "object_id": "t",
+                "name": "temperature"
+            },
         ],
         "static_attributes": [
             {
-                "type": "Relationship",
                 "name": "refStore",
-                "value": "broker:Room:001"}
+                "type": "relationship",
+                "value": "broker:Room:001"
+            }
         ]
     }
 }
-
-let  a = {
-    "device_id": "entity_name",
-    "entity_type": "Motion",
-    "attributes": [
-    {
-        "type": "Integer",
-        "object_id": "c",
-        "name": "count"
-    }
-],
-    "static_attributes": [
-    {
-        "type": "Relationship",
-        "name": "refStore",
-        "value": "broker:Room:001"
-    }
-]
-}
-
 
 const sendPostRequest = async () => {
     try {
