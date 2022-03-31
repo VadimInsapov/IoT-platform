@@ -7,13 +7,11 @@ function getInfoFromUser() {
 }
 
 let motionInfo = () => {
-    const infoFromUser = getInfoFromUser();
-    const device_id = infoFromUser.MAC_address;
     return {
-        "device_id": "mac:mqtt:thermometer001",
-        "entity_name": "broker:Thermometer:001",
+        "device_id": "mac:http:thermometer002",
+        "entity_name": "broker:Thermometer:002",
         "entity_type": "Thermometer",
-        "transport": "MQTT",
+        "transport": "HTTP",
         "dynamic_attributes": [
             {
                 "type": "number",

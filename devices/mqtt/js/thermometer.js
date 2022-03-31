@@ -1,7 +1,7 @@
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://localhost:1234');
 const random = require('random');
-let topic = '/mac:thermometer001/attrs'
+let topic = '/mac:mqtt:thermometer001/attrs';
 
 client.on('connect', ()=>{
     setInterval(() => {

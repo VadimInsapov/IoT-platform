@@ -1,9 +1,9 @@
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://localhost:1234');
 const random = require('random');
-let topic = '/mac:motion001/attrs'
+let topic = '/mac:mqtt:motion001/attrs'
 
-client.on('connect', ()=>{
+client.on('connect', ()=> {
     setInterval(() => {
         const message = {
             c:  String(random.int(0, 1)),
