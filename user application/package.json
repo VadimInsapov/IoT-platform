@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "sendHttpThermometer": "node js/sendHttpThermometer.js",
-    "sendMqttThermometer": "node js/sendMqttThermometer.js",
-    "getMqttBell": "node js/getMqttBell.js"
+    "initializeHttpThermometer": "node js/initializeHttpThermometer.js",
+    "initializeMqttThermometer": "node js/initializeMqttThermometer.js",
+    "initializeMqttBell": "node js/initializeMqttBell.js",
+    "updateMqttBell": "node js/updateMqttBell.js"
   },
   "author": "",
   "license": "ISC",

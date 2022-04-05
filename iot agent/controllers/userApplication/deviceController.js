@@ -8,10 +8,13 @@ exports.addDevice = function (mqttClient) {
             response.status(422).json({errors: errors.array()});
             return;
         }
-        const {transport: protocol, deviceId, entityName, dynamicAttributes = []} = request.body;
+        const {transport: protocol, deviceId, entityName, dynamicAttributes = [], commands = []} = request.body;
         //добавить в бд
+        //добавить commands в devices
         if (protocol === "MQTT") {
-            mqttClient.subscribe("/" + deviceId + "/attrs");
+            if (dynamicAttributes){
+                mqttClient.subscribe(`/${deviceId}/attrs`);
+            }
         }
         const device = new Device(deviceId, entityName, dynamicAttributes);
         device.save();

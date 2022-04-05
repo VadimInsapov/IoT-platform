@@ -9,6 +9,12 @@ module.exports = class Device {
     static find(deviceId) {
         return devices.get(deviceId);
     }
+    static findByEntityName(entityName){
+        for (let [key, value] of devices.entries()) {
+            if (value.entityName === entityName)
+                return key;
+        }
+    }
 
     save() {
         devices.set(this.key, this.value);

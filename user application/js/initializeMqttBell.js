@@ -1,9 +1,9 @@
 const axios = require('axios').default;
 let motionInfo = () => {
     return {
-        "deviceId": "mac:mqtt:thermometer001",
-        "entityName": "broker:Thermometer:001",
-        "entityType": "Thermometer",
+        "deviceId": "mac:mqtt:bell001",
+        "entityName": "broker:Bell:001",
+        "entityType": "Bell",
         "transport": "MQTT",
         "commands": [
             {
