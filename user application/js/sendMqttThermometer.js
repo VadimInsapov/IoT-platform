@@ -10,27 +10,27 @@ let motionInfo = () => {
     const infoFromUser = getInfoFromUser();
     const device_id = infoFromUser.MAC_address;
     return {
-        "device_id": "mac:mqtt:thermometer001",
-        "entity_name": "broker:Thermometer:001",
-        "entity_type": "Thermometer",
+        "deviceId": "mac:mqtt:thermometer001",
+        "entityName": "broker:Thermometer:001",
+        "entityType": "Thermometer",
         "transport": "MQTT",
-        "dynamic_attributes": [
+        "dynamicAttributes": [
             {
                 "type": "number",
-                "object_id": "h",
+                "objectId": "h",
                 "name": "humidity"
             },
             {
                 "type": "number",
-                "object_id": "t",
+                "objectId": "t",
                 "name": "temperature"
             },
         ],
-        "static_attributes": [
+        "staticAttributes": [
             {
                 "name": "refStore",
-                "type": "relationship",
-                "value": "broker:Room:001"
+                "type": "text",
+                "value": "ss"
             }
         ]
     }
@@ -39,9 +39,10 @@ let motionInfo = () => {
 const sendPostRequest = async () => {
     try {
         const resp = await axios.post('http://localhost:4041/devices', motionInfo());
-        console.log(resp.data);
+        // console.log(resp.data);
     } catch (err) {
-        console.error(err);
+        console.log(err.response.status);
+        console.log(err.response.data);
     }
 };
 sendPostRequest();

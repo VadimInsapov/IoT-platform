@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "sendHttpThermometer": "node js/sendHttpThermometer.js",
+    "sendMqttThermometer": "node js/sendMqttThermometer.js",
+    "getMqttBell": "node js/getMqttBell.js"
   },
   "author": "",
   "license": "ISC",

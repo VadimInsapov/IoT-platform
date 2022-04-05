@@ -8,23 +8,23 @@ function getInfoFromUser() {
 
 let motionInfo = () => {
     return {
-        "device_id": "mac:http:thermometer002",
-        "entity_name": "broker:Thermometer:002",
-        "entity_type": "Thermometer",
+        "deviceId": "mac:http:thermometer002",
+        "entityName": "broker:Thermometer:002",
+        "entityType": "Thermometer",
         "transport": "HTTP",
-        "dynamic_attributes": [
+        "dynamicAttributes": [
             {
                 "type": "number",
-                "object_id": "h",
+                "objectId": "h",
                 "name": "humidity"
             },
             {
                 "type": "number",
-                "object_id": "t",
+                "objectId": "t",
                 "name": "temperature"
             },
         ],
-        "static_attributes": [
+        "staticAttributes": [
             {
                 "name": "refStore",
                 "type": "relationship",
@@ -37,9 +37,9 @@ let motionInfo = () => {
 const sendPostRequest = async () => {
     try {
         const resp = await axios.post('http://localhost:4041/devices', motionInfo());
-        console.log(resp.data);
     } catch (err) {
-        console.error(err);
+        console.log(err.response.status);
+        console.log(err.response.data);
     }
 };
 sendPostRequest();
