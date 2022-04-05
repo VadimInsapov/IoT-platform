@@ -22,7 +22,7 @@ module.exports = class Device {
         let a = {};
         a["entityName"] = entityName;
         let attributes = dynamicAttributes.reduce((attributes, currentValue) => {
-            attributes[currentValue.object_id] = {
+            attributes[currentValue.objectId] = {
                 type: currentValue.type,
                 name: currentValue.name,
             }
