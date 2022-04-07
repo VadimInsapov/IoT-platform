@@ -1,12 +1,9 @@
-const Device = require("../../models/device");
+const IoTAgentDevice = require("../../models/IoTAgentDevice");
 const util = require("util");
-exports.matchDevicesAndGetObjectForDB = (deviceId, clientAttributes) => {
-    //добавить проверку нашли, не нашли
-    const device = Device.find(deviceId);
-    // console.log(device);
-    const brokerId = device.entityName;
-    const brokerNewAttributes = getObjectWithNewAttributes(clientAttributes, device.attributes);
-    //к преобразованию типа подготовить
+
+exports.matchDevicesAndGetObjectForDB = (iotAgentDeviceValue, clientAttributes) => {
+    const brokerId = iotAgentDeviceValue.entityName;
+    const brokerNewAttributes = getObjectWithNewAttributes(clientAttributes, iotAgentDeviceValue.attributes);
     return {
         id: brokerId,
         attributes: brokerNewAttributes,
@@ -17,8 +14,18 @@ const getObjectWithNewAttributes = (mqttAttributes, deviceAttributes) => {
     for (const mqttAttr in mqttAttributes) {
         let newAttr = deviceAttributes[mqttAttr].name;
         let type = deviceAttributes[mqttAttr].type;
-        //преобразовать к типам
         let newValue = mqttAttributes[mqttAttr];
+        // switch (type) {
+        //     case "number" :
+        //         newValue = +newValue;
+        //         break;
+        //     case "text" :
+        //         newValue = String(newValue);
+        //         break;
+        //     case "boolean" :
+        //         newValue = Boolean(newValue);
+        //         break;
+        // }
         brokerNewAttributes[newAttr] = newValue;
     }
     return brokerNewAttributes;

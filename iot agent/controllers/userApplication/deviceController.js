@@ -1,25 +1,31 @@
-const Device = require('../../models/device.js');
+const IoTAgentDevice = require('../../models/IoTAgentDevice.js');
 const util = require('util');
 const {body, validationResult, checkSchema} = require('express-validator/check');
+const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
+
 exports.addDevice = function (mqttClient) {
     return function (request, response) {
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
-            response.status(422).json({errors: errors.array()});
+            sendResponseWithErrors(response, errors);
             return;
         }
-        const {transport: protocol, deviceId, entityName, dynamicAttributes = [], commands = []} = request.body;
+        const {
+            deviceId,
+            entityName,
+            transport: protocol,
+            endpoint,
+            dynamicAttributes = [],
+            commands = []
+        } = request.body;
         //добавить в бд
-        //добавить commands в devices
         if (protocol === "MQTT") {
-            if (dynamicAttributes){
-                mqttClient.subscribe(`/${deviceId}/attrs`);
-            }
+            mqttClient.subscribe(`/${deviceId}/attrs`);
         }
-        const device = new Device(deviceId, entityName, dynamicAttributes);
-        device.save();
-        console.log(util.inspect(Device.getAll(), false, null, true))
-        // сделать ответ responsex
+        const iotAgentDevice = new IoTAgentDevice(deviceId, entityName, endpoint, dynamicAttributes, commands);
+        iotAgentDevice.save();
+        console.log(util.inspect(IoTAgentDevice.getAll(), false, null, true))
+        response.status(200).json("IoTAgentDevice was made");
     }
 };
 
@@ -30,12 +36,16 @@ exports.validate = (method) => {
             return [
                 body('deviceId')
                     .not().isEmpty()
-                    .withMessage('The deviceId is required'),
+                    .withMessage('The deviceId is required')
+                    .custom(deviceId => !IoTAgentDevice.find(deviceId))
+                    .withMessage('The deviceId already in use'),
                 body('entityName')
                     .not().isEmpty()
                     .withMessage('The entityType is required')
                     .matches(/broker:.+?:\d{3}/)
-                    .withMessage("Invalid entityName"),
+                    .withMessage("Invalid entityName")
+                    .custom(entityName => !IoTAgentDevice.find(entityName))
+                    .withMessage('The entityName already in use'),
                 body('entityType')
                     .not().isEmpty()
                     .withMessage('The entityType is required')
@@ -78,7 +88,7 @@ exports.validate = (method) => {
                 body('commands')
                     .optional({checkFalsy: true})
                     .isArray()
-                    .withMessage('The dynamicAttributes is not array'),
+                    .withMessage('The commands is not array'),
                 body('commands.*.type')
                     .not().isEmpty()
                     .withMessage('The commands.type is required')

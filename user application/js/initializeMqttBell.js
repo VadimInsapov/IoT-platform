@@ -23,7 +23,9 @@ let motionInfo = () => {
 
 const sendPostRequest = async () => {
     try {
-        const resp = await axios.post('http://localhost:4041/devices', motionInfo());
+        const response = await axios.post('http://localhost:4041/devices', motionInfo());
+        console.log(response.status);
+        console.log(response.data);
     } catch (err) {
         console.log(err.response.status);
         console.log(err.response.data);
