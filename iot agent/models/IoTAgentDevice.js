@@ -1,7 +1,14 @@
 const IoTAgentDevices = new Map();
 
 module.exports = class IoTAgentDevice {
-    constructor(deviceId, entityName, endpoint, dynamicAttributes, commands) {
+    constructor(body) {
+        const {
+            deviceId,
+            entityName,
+            endpoint,
+            dynamicAttributes = [],
+            commands = []
+        } = body;
         this.key = deviceId;
         this.value = this.getValueForDevices(entityName, endpoint, dynamicAttributes, commands);
     }

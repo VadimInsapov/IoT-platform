@@ -1,5 +1,7 @@
 const IoTAgentDevice = require('../../models/IoTAgentDevice.js');
-const util = require('util');
+const mongoose = require("mongoose");
+const deviceScheme = require("../../models/Device");
+const logger = require("../logger");
 const {body, validationResult, checkSchema} = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
 
@@ -10,25 +12,38 @@ exports.addDevice = function (mqttClient) {
             sendResponseWithErrors(response, errors);
             return;
         }
-        const {
-            deviceId,
-            entityName,
-            transport: protocol,
-            endpoint,
-            dynamicAttributes = [],
-            commands = []
-        } = request.body;
-        //добавить в бд
+        const {deviceId, entityType, transport: protocol} = request.body;
         if (protocol === "MQTT") {
             mqttClient.subscribe(`/${deviceId}/attrs`);
         }
-        const iotAgentDevice = new IoTAgentDevice(deviceId, entityName, endpoint, dynamicAttributes, commands);
+        const iotAgentDevice = new IoTAgentDevice(request.body);
         iotAgentDevice.save();
-        console.log(util.inspect(IoTAgentDevice.getAll(), false, null, true))
+        logger.showAll(IoTAgentDevice);
+
+        const Device = mongoose.model(entityType, deviceScheme);
+        const device = new Device(getDeviceForDB(request.body));
+        device.save();
+
         response.status(200).json("IoTAgentDevice was made");
     }
 };
 
+function getDeviceForDB(body) {
+    const {
+        entityName,
+        dynamicAttributes = [],
+        commands = []
+    } = body;
+    let object = {};
+    object["_id"] = entityName;
+    for (const attribute of dynamicAttributes) {
+        object[attribute.name] = 'null';
+    }
+    for (const command of commands) {
+        object[command.name] = '';
+    }
+    return object;
+}
 
 exports.validate = (method) => {
     switch (method) {

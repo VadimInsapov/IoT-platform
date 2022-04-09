@@ -9,6 +9,7 @@ const deviceController = require('./controllers/userApplication/deviceController
 const httpController = require('./controllers/iotClients/httpClients/httpController');
 const mqttController = require('./controllers/iotClients/mqttClients/mqttController');
 const brokerController = require('./controllers/broker/brokerController');
+const mongoose = require("mongoose");
 
 appSouth.use(jsonParser);
 appSouth.use(expressValidator());
@@ -22,3 +23,5 @@ appNorth.post("/iot", httpController.matchFromDevicesAndSendDataToDB);
 appNorth.listen(7896);
 
 mqttClient.on('message', mqttController.matchFromDevicesAndSendDataToDB);
+
+mongoose.connect("mongodb://localhost:27017/things", { useUnifiedTopology: true });
