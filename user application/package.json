@@ -7,8 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "initializeHttpThermometer": "node js/initializeHttpThermometer.js",
     "initializeMqttThermometer": "node js/initializeMqttThermometer.js",
+    "deleteMqttThermometer": "node js/deleteMqttThermometer.js",
+    "initializeHttpMotion": "node js/initializeHttpMotion.js",
+    "initializeMqttMotion": "node js/initializeMqttMotion.js",
     "initializeMqttBell": "node js/initializeMqttBell.js",
-    "updateMqttBell": "node js/updateMqttBell.js"
+    "initializeHttpBell": "node js/initializeHttpBell.js",
+    "updateMqttBell": "node js/updateMqttBell.js",
+    "updateHttpBell": "node js/updateHttpBell.js"
   },
   "author": "",
   "license": "ISC",

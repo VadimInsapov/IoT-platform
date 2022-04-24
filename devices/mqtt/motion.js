@@ -1,7 +1,9 @@
 const mqtt = require('mqtt')
 const client = mqtt.connect('mqtt://localhost:1234');
 const random = require('random');
-let topic = '/mac:mqtt:motion001/attrs'
+let topic = '/mac:mqtt:motion001/attributes'
+console.log("MQTT датчик движения");
+console.log("Расположение Broker-a" + "mqtt://localhost:1234");
 
 client.on('connect', ()=> {
     setInterval(() => {

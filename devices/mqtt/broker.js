@@ -6,7 +6,6 @@ broker.on('ready', ()=>{
     console.log('Broker is ready!')
 })
 
-broker.on('published', (packet)=>{
-    message = packet.payload.toString()
-    console.log(message)
+broker.on('published', (packet, client)=>{
+    console.log(`${packet.topic} -m ${packet.payload}`);
 })

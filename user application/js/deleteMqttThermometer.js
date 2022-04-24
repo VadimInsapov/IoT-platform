@@ -29,6 +29,7 @@ let motionInfo = () => {
         "relationships": [
             {
                 "name": "refStore",
+                "type": "Relationship",
                 "value": "broker:room:001"
             }
         ]
@@ -37,7 +38,7 @@ let motionInfo = () => {
 
 const sendPostRequest = async () => {
     try {
-        const resp = await axios.post('http://localhost:4041/devices', motionInfo());
+        const resp = await axios.delete('http://localhost:4041/devices/mac:mqtt:thermometer001');
         // console.log(resp.data);
     } catch (err) {
         console.log(err.response.status);
