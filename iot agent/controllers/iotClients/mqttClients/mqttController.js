@@ -2,7 +2,7 @@ const matcherDB = require("../matcherDB");
 const logger = require("../../logger");
 const IoTAgentDevice = require("../../../models/IoTAgentDevice.js");
 const mongoose = require("mongoose");
-const deviceScheme = require("../../../models/Device");
+const objectScheme = require("../../../models/ObjectScheme");
 const parseMessage = (message) => JSON.parse(message);
 exports.matchFromDevicesAndSendDataToDB = (topic, message) => {
     const deviceId = topic.split('/')[1];
@@ -12,7 +12,7 @@ exports.matchFromDevicesAndSendDataToDB = (topic, message) => {
     const brokerId = matcherDB.getBrokerId(iotAgentDeviceValue);
     const newAttributes = matcherDB.getBrokerAttributes(iotAgentDeviceValue, mqttClientAttributes);
     const entityType = brokerId.split(':')[1];
-    const Device = mongoose.model(entityType, deviceScheme);
+    const Device = mongoose.model(entityType, objectScheme);
     Device.findByIdAndUpdate(brokerId, newAttributes, logger.showError);
     logger.send(brokerId, newAttributes);
 }

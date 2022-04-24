@@ -5,22 +5,47 @@ module.exports = class IoTAgentDevice {
         const {
             deviceId,
             entityName,
-            endpoint,
+            transport: protocol,
+            endpoint = "",
             dynamicAttributes = [],
             commands = []
         } = body;
         this.key = deviceId;
-        this.value = this.getValueForDevices(entityName, endpoint, dynamicAttributes, commands);
+        this.value = this.getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands);
     }
 
     static find(deviceId) {
         return IoTAgentDevices.get(deviceId);
     }
+    static getBrokerId(deviceId) {
+        return this.find(deviceId).entityName;
+    }
+    static getProtocol(deviceId) {
+        return this.find(deviceId).protocol;
+    }
+    static delete(deviceId) {
+        return IoTAgentDevices.delete(deviceId);
+    }
 
-    static findByEntityName(entityName) {
+    static findDeviceByEntityName(entityName) {
         for (let [key, value] of IoTAgentDevices.entries()) {
             if (value.entityName === entityName)
-                return key;
+                return {
+                    deviceId: key,
+                    commands: value.commands,
+                };
+        }
+    }
+    static getProtocolByEntityName(entityName) {
+        for (let [key, value] of IoTAgentDevices.entries()) {
+            if (value.entityName === entityName)
+                return value.protocol;
+        }
+    }
+    static getEndpointByEntityName(entityName) {
+        for (let [key, value] of IoTAgentDevices.entries()) {
+            if (value.entityName === entityName)
+                return value.endpoint;
         }
     }
 
@@ -32,17 +57,18 @@ module.exports = class IoTAgentDevice {
         return IoTAgentDevices;
     }
 
-    getValueForDevices(entityName, endpoint, dynamicAttributes, commands) {
+    getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands) {
         let a = {};
         a["entityName"] = entityName;
-        if (dynamicAttributes) a["attributes"] = this.getAttributes(dynamicAttributes);
-        if (commands) a["commands"] = this.getCommands(commands);
-        if (endpoint) a["endpoint"] = endpoint;
+        a["protocol"] = protocol;
+        if (dynamicAttributes.length !== 0) a["attributes"] = this.getAttributes(dynamicAttributes);
+        if (commands.length !== 0) a["commands"] = this.getCommands(commands);
+        if (endpoint !== "") a["endpoint"] = endpoint;
         return a;
     }
 
     getCommands(commands) {
-        let ourCommands = commands.reduce((commands, currentValue) => commands.push(currentValue.command), []);
+        let ourCommands = commands.map(currentValue => (currentValue.name));
         return ourCommands;
     }
 

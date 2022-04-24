@@ -1,8 +1,10 @@
 const IoTAgentDevice = require('../../models/IoTAgentDevice.js');
 const mongoose = require("mongoose");
-const deviceScheme = require("../../models/Device");
+const objectScheme = require("../../models/ObjectScheme");
 const logger = require("../logger");
-const {body, validationResult, checkSchema} = require('express-validator/check');
+const {body, validationResult, checkSchema, check, query, param} = require('express-validator/check');
+const objectPreparer = require("./objectPreparer");
+const {validate} = require("./deviceController");
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
 
 exports.addDevice = function (mqttClient) {
@@ -12,38 +14,48 @@ exports.addDevice = function (mqttClient) {
             sendResponseWithErrors(response, errors);
             return;
         }
-        const {deviceId, entityType, transport: protocol} = request.body;
+        const {deviceId, entityType, protocol} = request.body;
         if (protocol === "MQTT") {
-            mqttClient.subscribe(`/${deviceId}/attrs`);
+            mqttClient.subscribe(`/${deviceId}/attributes`);
         }
         const iotAgentDevice = new IoTAgentDevice(request.body);
         iotAgentDevice.save();
         logger.showAll(IoTAgentDevice);
 
-        const Device = mongoose.model(entityType, deviceScheme);
-        const device = new Device(getDeviceForDB(request.body));
-        device.save();
-
-        response.status(200).json("IoTAgentDevice was made");
+        const Device = mongoose.model(entityType, objectScheme);
+        const device = new Device(objectPreparer(request.body));
+        device.save(function (err) {
+            if (err) return logger.showError(err);
+            logger.deviceWasMadeByUser(deviceId);
+        });
+        response.status(200).json(`The IoTAgentDevice ${deviceId} was made`);
     }
 };
 
-function getDeviceForDB(body) {
-    const {
-        entityName,
-        dynamicAttributes = [],
-        commands = []
-    } = body;
-    let object = {};
-    object["_id"] = entityName;
-    for (const attribute of dynamicAttributes) {
-        object[attribute.name] = 'null';
+exports.deleteDevice = function (mqttClient) {
+    return function (request, response) {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            sendResponseWithErrors(response, errors);
+            return;
+        }
+        const deviceId = request.params.deviceId;
+        const iotAgentDevice = IoTAgentDevice.find(deviceId);
+        IoTAgentDevice.delete(deviceId);
+        const {protocol, entityName: brokerId} = iotAgentDevice;
+        if (protocol === "MQTT") {
+            mqttClient.unsubscribe(`/${deviceId}/attributes`);
+        }
+        const entityType = brokerId.split(":")[1];
+        const Device = mongoose.model(entityType, objectScheme);
+        Device.findByIdAndDelete(brokerId, function (err, doc) {
+            if (err) return logger.showError(err);
+            console.log(`The device ${deviceId} was deleted`);
+        });
+        logger.showAll(IoTAgentDevice);
+        response.status(200).json(`The IoTAgentDevice ${deviceId} was deleted`);
     }
-    for (const command of commands) {
-        object[command.name] = '';
-    }
-    return object;
-}
+};
 
 exports.validate = (method) => {
     switch (method) {
@@ -112,43 +124,33 @@ exports.validate = (method) => {
                 body('commands.*.name')
                     .not().isEmpty()
                     .withMessage('The commands.name is required'),
-                body('staticAttributes')
+                body('relationships')
                     .optional({checkFalsy: true})
                     .isArray()
-                    .withMessage('The staticAttributes is not array'),
-                body('staticAttributes.*.name')
+                    .withMessage('The commands is not array'),
+                body('relationships.*.name')
                     .not().isEmpty()
-                    .withMessage('The staticAttributes.name is required'),
-                body('staticAttributes.*.value')
+                    .withMessage('The relationships.name is required'),
+                body('relationships.*.value')
                     .not().isEmpty()
-                    .withMessage('The staticAttributes.value is required'),
-                body('staticAttributes.*.type')
-                    .not().isEmpty()
-                    .withMessage('The staticAttributes.type is required')
-                    .isIn(['number', 'text', 'boolean', 'array', 'relationship'])
-                    .withMessage('Wrong the staticAttributes.type, type is unknown'),
-                body('staticAttributes.*')
-                    .custom((staticAttribute, {req}) => {
-                        const type = staticAttribute.type;
-                        const value = staticAttribute.value;
-                        if (type === 'number') {
-                            return typeof value === 'number';
-                        }
-                        if (type === 'text') {
-                            return typeof value === 'string';
-                        }
-                        if (type === 'relationship') {
-                            const regularExp = /broker:.+?:\d{3}/;
-                            return regularExp.test(value);
-                        }
-                        if (type === 'array') {
-                            return Array.isArray(value);
-                        }
-                        if (type === 'boolean') {
-                            return (typeof value === "boolean");
-                        }
+                    .withMessage('The relationships.value is required')
+                    .matches(/broker:.+?:\d{3}/)
+                    .withMessage("Invalid relationships.value")
+                    .custom(brokerId => {
+                        const entityType = brokerId.split(":")[1];
+                        const Device = mongoose.model(entityType, objectScheme);
+                        return Device.findById(brokerId);
                     })
-                    .withMessage("Invalid staticAttributes.value, look at staticAttributes.type")
+                    .withMessage("The IoT Platform doesn't have relationships.value"),
+            ]
+        }
+        case 'deleteDevice': {
+            return [
+                param('deviceId')
+                    .not().isEmpty()
+                    .withMessage('The deviceId in params is required')
+                    .custom(deviceId => IoTAgentDevice.find(deviceId))
+                    .withMessage("The deviceId wasn't found in IoT Platform"),
             ]
         }
     }

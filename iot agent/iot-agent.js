@@ -14,6 +14,7 @@ const mongoose = require("mongoose");
 appSouth.use(jsonParser);
 appSouth.use(expressValidator());
 appSouth.post("/devices",deviceController.validate('addDevice'), deviceController.addDevice(mqttClient));
+appSouth.delete("/devices/:deviceId", deviceController.validate('deleteDevice'), deviceController.deleteDevice(mqttClient));
 appSouth.post("/update", brokerController.updateState(mqttClient));
 appSouth.listen(4041);
 
