@@ -4,7 +4,7 @@ const objectScheme = require("../../models/ObjectScheme");
 const logger = require("../logger");
 const {body, validationResult, checkSchema, check, query, param} = require('express-validator/check');
 const objectPreparer = require("./objectPreparer");
-const {validate} = require("./deviceController");
+const models = require("./models");
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
 
 exports.addDevice = function (mqttClient) {
@@ -14,14 +14,13 @@ exports.addDevice = function (mqttClient) {
             sendResponseWithErrors(response, errors);
             return;
         }
-        const {deviceId, entityType, protocol} = request.body;
+        const {deviceId, entityType, transport: protocol} = request.body;
         if (protocol === "MQTT") {
             mqttClient.subscribe(`/${deviceId}/attributes`);
         }
         const iotAgentDevice = new IoTAgentDevice(request.body);
         iotAgentDevice.save();
         logger.showAll(IoTAgentDevice);
-
         const Device = mongoose.model(entityType, objectScheme);
         const device = new Device(objectPreparer(request.body));
         device.save(function (err) {
@@ -31,6 +30,31 @@ exports.addDevice = function (mqttClient) {
         response.status(200).json(`The IoTAgentDevice ${deviceId} was made`);
     }
 };
+
+exports.addDeviceByModel = function (mqttClient) {
+    return function (request, response) {
+        const errors = validationResult(request);
+        if (!errors.isEmpty()) {
+            sendResponseWithErrors(response, errors);
+            return;
+        }
+        const body = request.body;
+        const modelAttributes = models.getAttributes(body.model);
+        if ("commands" in modelAttributes && modelAttributes.transport === "HTTP") {
+            if (!("endpoint" in body))
+                response.status(400).json(`Device with HTTP transport and commands must have endpoint\nThis model has these attributes!`);
+        }
+        delete body.model;
+        const newBody = {
+            ...body,
+            ...modelAttributes
+        };
+        request.body = newBody;
+        module.exports.addDevice(mqttClient)(request, response);
+    }
+};
+
+
 
 exports.deleteDevice = function (mqttClient) {
     return function (request, response) {
@@ -58,21 +82,46 @@ exports.deleteDevice = function (mqttClient) {
 };
 
 exports.validate = (method) => {
+    const generalValidationRulesForCreateAndCreateByModel = [
+        body('deviceId')
+            .not().isEmpty()
+            .withMessage('The deviceId is required')
+            .custom(deviceId => !IoTAgentDevice.find(deviceId))
+            .withMessage('The deviceId already in use'),
+        body('entityName')
+            .not().isEmpty()
+            .withMessage('The entityType is required')
+            .matches(/broker:.+?:\d{3}/)
+            .withMessage("Invalid entityName")
+            .custom(entityName => !IoTAgentDevice.findDeviceByEntityName(entityName))
+            .withMessage('The entityName already in use'),
+        body('relationships')
+            .optional({checkFalsy: true})
+            .isArray()
+            .withMessage('The commands is not array'),
+        body('relationships.*.name')
+            .not().isEmpty()
+            .withMessage('The relationships.name is required'),
+        body('relationships.*.value')
+            .not().isEmpty()
+            .withMessage('The relationships.value is required')
+            .matches(/broker:.+?:\d{3}/)
+            .withMessage("Invalid relationships.value")
+            .custom(brokerId => {
+                const entityType = brokerId.split(":")[1];
+                const Device = mongoose.model(entityType, objectScheme);
+                return Device.findById(brokerId);
+            })
+            .withMessage("The IoT Platform doesn't have relationships.value"),
+    ]
     switch (method) {
         case 'addDevice': {
             return [
-                body('deviceId')
-                    .not().isEmpty()
-                    .withMessage('The deviceId is required')
-                    .custom(deviceId => !IoTAgentDevice.find(deviceId))
-                    .withMessage('The deviceId already in use'),
-                body('entityName')
-                    .not().isEmpty()
-                    .withMessage('The entityType is required')
-                    .matches(/broker:.+?:\d{3}/)
-                    .withMessage("Invalid entityName")
-                    .custom(entityName => !IoTAgentDevice.find(entityName))
-                    .withMessage('The entityName already in use'),
+                ...generalValidationRulesForCreateAndCreateByModel,
+                body('endpoint')
+                    .optional({checkFalsy: true})
+                    .matches(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)
+                    .withMessage("Invalid endpoint"),
                 body('entityType')
                     .not().isEmpty()
                     .withMessage('The entityType is required')
@@ -90,10 +139,6 @@ exports.validate = (method) => {
                         return true;
                     })
                     .withMessage("Device with HTTP transport and commands must have endpoint"),
-                body('endpoint')
-                    .optional({checkFalsy: true})
-                    .matches(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/)
-                    .withMessage("Invalid endpoint"),
                 body(['dynamicAttributes', 'commands'])
                     .custom((value, {req}) => req.body.dynamicAttributes || req.body.commands)
                     .withMessage('At least dynamicAttributes or commands must exist'),
@@ -124,24 +169,16 @@ exports.validate = (method) => {
                 body('commands.*.name')
                     .not().isEmpty()
                     .withMessage('The commands.name is required'),
-                body('relationships')
-                    .optional({checkFalsy: true})
-                    .isArray()
-                    .withMessage('The commands is not array'),
-                body('relationships.*.name')
+            ]
+        }
+        case 'addDeviceByModel': {
+            return [
+                ...generalValidationRulesForCreateAndCreateByModel,
+                body('model')
                     .not().isEmpty()
-                    .withMessage('The relationships.name is required'),
-                body('relationships.*.value')
-                    .not().isEmpty()
-                    .withMessage('The relationships.value is required')
-                    .matches(/broker:.+?:\d{3}/)
-                    .withMessage("Invalid relationships.value")
-                    .custom(brokerId => {
-                        const entityType = brokerId.split(":")[1];
-                        const Device = mongoose.model(entityType, objectScheme);
-                        return Device.findById(brokerId);
-                    })
-                    .withMessage("The IoT Platform doesn't have relationships.value"),
+                    .withMessage('The model is required')
+                    .custom((value, {req}) => models.include(value))
+                    .withMessage('The model unknown'),
             ]
         }
         case 'deleteDevice': {

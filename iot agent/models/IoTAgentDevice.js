@@ -35,6 +35,7 @@ module.exports = class IoTAgentDevice {
                     commands: value.commands,
                 };
         }
+        return false;
     }
     static getProtocolByEntityName(entityName) {
         for (let [key, value] of IoTAgentDevices.entries()) {
