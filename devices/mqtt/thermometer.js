@@ -1,17 +1,29 @@
-const mqtt = require('mqtt')
-const client = mqtt.connect('mqtt://localhost:1234');
-const random = require('random');
-let topic = '/mac:mqtt:thermometer001/attributes';
-console.log("MQTT термометр");
-console.log("Расположение Broker-a" + "mqtt://localhost:1234");
-
-client.on('connect', ()=>{
-    setInterval(() => {
-        const message = {
-            t: String(random.int(15, 18)),
-            h: String(random.int(40, 50)),
-        };
-        client.publish(topic, JSON.stringify(message))
-        console.log(`${topic} -m ${JSON.stringify(message)}`);
-    }, 5000)
+const mqtt = require('mqtt');
+const thermometerFunctions = require('../thermometerFunctions');
+const infoDevice = require('../infoDevice');
+const ms = thermometerFunctions.getMs();
+const shortDeviceInfo = {
+    name: "Термометр MQTT",
+    transport: "MQTT",
+    type: "Sensor",
+    macAddress: "mac:mqtt:thermometer001",
+    functionForDataGenerate: {
+        type: 'interval',
+        ms: ms,
+        attributes: {
+            t: "15-17",
+            h: "40-50",
+        },
+    }
+};
+const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
+console.log(fullDeviceInfo);
+const {topic, brokerSettings} = fullDeviceInfo;
+const client = mqtt.connect(brokerSettings);
+client.on('connect', () => {
+    console.log("The Device connected successfully!")
 })
+setInterval(() => {
+    client.publish(topic, JSON.stringify(thermometerFunctions.getMessage()))
+    console.log(`${topic} -m ${JSON.stringify(thermometerFunctions.getMessage())}`);
+}, ms)

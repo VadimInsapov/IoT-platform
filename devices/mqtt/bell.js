@@ -1,14 +1,20 @@
-const mqtt = require('mqtt')
-const client = mqtt.connect('mqtt://localhost:1234');
-const random = require('random');
-let topic = '/mac:mqtt:bell001/commands';
-console.log("MQTT звонок");
-console.log("Расположение Broker-a" + "mqtt://localhost:1234");
-
+const mqtt = require('mqtt');
+const infoDevice = require("../infoDevice");
+const shortDeviceInfo = {
+    name: "Звонок MQTT",
+    transport: "MQTT",
+    type: "Actuator",
+    macAddress: "mac:mqtt:bell001",
+};
+const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
+console.log(fullDeviceInfo);
+const {topic, brokerSettings} = fullDeviceInfo;
+const client = mqtt.connect(brokerSettings);
 client.on('connect', () => {
+    console.log("The Device connected successfully!")
     client.subscribe(topic);
 })
-client.on('message', (topic, message) =>{
-    console.log("To Do: ");
-    console.log(JSON.parse(message));
+client.on('message', (topic, message) => {
+    const res = JSON.parse(message).command === "ring" ? true : false;
+    if (res)   console.log('\x1b[32m%s\x1b[0m', "State has changed! The bell is ringing!");
 });

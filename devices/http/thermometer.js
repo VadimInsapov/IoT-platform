@@ -1,29 +1,33 @@
 const random = require('random');
+const infoDevice = require("../infoDevice");
+const thermometerFunctions = require("../thermometerFunctions");
 const axios = require('axios').default;
-let deviceId = 'mac:http:thermometer002'
-
-const getMessage = () => {
-    return {
-        t: String(random.int(15, 18)),
-        h: String(random.int(40, 50)),
-    }
-}
-const getConfig = () => {
-    return {
-        params: {
-            deviceId: deviceId
+const ms = thermometerFunctions.getMs();
+const shortDeviceInfo = {
+    name: "Датчик движения HTTP",
+    transport: "HTTP",
+    type: "Sensor",
+    macAddress: "mac:http:thermometer001",
+    functionForDataGenerate: {
+        type: 'interval',
+        ms: ms,
+        attributes: {
+            t: "15-17",
+            h: "40-50",
         },
-    };
-}
-console.log("HTTP термометр");
-console.log("http://localhost:7896/iot");
-console.log("MAC-address: "+ deviceId);
+    }
+};
+const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
+console.log(fullDeviceInfo);
+const {iotAgentEndpoint} = fullDeviceInfo;
 setInterval(() => {
-    axios.post('http://localhost:7896/iot', getMessage(), getConfig())
+    axios.post(iotAgentEndpoint, thermometerFunctions.getMessage())
+        .then(() => {
+        })
         .catch(err => {
             console.log(err.response.status);
             console.log(err.response.data);
         })
-}, 5000);
+}, ms);
 
 
