@@ -4,16 +4,29 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "initializeHttpThermometer": "node js/initializeHttpThermometer.js",
-    "initializeMqttThermometer": "node js/initializeMqttThermometer.js",
-    "deleteMqttThermometer": "node js/deleteMqttThermometer.js",
-    "initializeHttpMotion": "node js/initializeHttpMotion.js",
-    "initializeMqttMotion": "node js/initializeMqttMotion.js",
-    "initializeMqttBell": "node js/initializeMqttBell.js",
-    "initializeHttpBell": "node js/initializeHttpBell.js",
-    "updateMqttBell": "node js/updateMqttBell.js",
-    "updateHttpBell": "node js/updateHttpBell.js"
+    "initializeHttpThermometer": "node Devices/Thermometer/initializeHttpThermometer.js",
+    "initializeMqttThermometer": "node Devices/Thermometer/initializeMqttThermometer.js",
+    "deleteMqttThermometer": "node Devices/Thermometer/deleteMqttThermometer.js",
+
+    "initializeHttpMotion": "node Devices/Motion/initializeHttpMotion.js",
+    "initializeMqttMotion": "node Devices/Motion/initializeMqttMotion.js",
+
+    "initializeMqttBell": "node Devices/Bell/initializeMqttBell.js",
+    "initializeHttpBell": "node Devices/Bell/initializeHttpBell.js",
+    "updateMqttBell": "node Devices/Bell/updateMqttBell.js",
+    "updateHttpBell": "node Devices/Bell/updateHttpBell.js",
+
+    "initializeMqttLamp": "node Devices/Lamp/initializeMqttLamp.js",
+    "initializeHttpLamp": "node Devices/Lamp/initializeHttpLamp.js",
+    "updateMqttLamp": "node Devices/Lamp/updateMqttLamp.js",
+    "updateHttpLamp": "node Devices/Lamp/updateHttpLamp.js",
+
+    "initializeMqttDoor": "node Devices/Door/initializeMqttDoor.js",
+    "initializeHttpDoor": "node Devices/Door/initializeHttpDoor.js",
+    "updateMqttDoor": "node Devices/Door/updateMqttDoor.js",
+    "updateHttpDoor": "node Devices/Door/updateHttpDoor.js",
+
+    "initializeMqttThermometerByModel": "node Devices/createDeviceByModel.js"
   },
   "author": "",
   "license": "ISC",

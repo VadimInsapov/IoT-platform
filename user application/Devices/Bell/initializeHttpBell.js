@@ -1,11 +1,11 @@
 const axios = require('axios').default;
 let motionInfo = () => {
     return {
-        "deviceId": "mac:http:bell002",
-        "entityName": "broker:Bell:002",
+        "deviceId": "mac:http:bell001",
+        "entityName": "broker:Bell:001",
         "entityType": "Bell",
         "transport": "HTTP",
-        "endpoint": "http://127.0.0.1:3010/mac:http:bell002/commands",
+        "endpoint": "http://127.0.0.1:3001/mac:http:bell001/commands",
         "commands": [
             {
                 "type": "command",

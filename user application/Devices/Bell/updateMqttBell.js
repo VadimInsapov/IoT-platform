@@ -2,7 +2,7 @@ const axios = require('axios').default;
 
 let motionInfo = () => {
     return {
-        "id": "broker:Bell:002",
+        "id": "broker:Bell:001",
         "command": "ring",
     }
 }
