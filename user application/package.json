@@ -4,28 +4,24 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start" : "nodemon backend/server.js",
     "initializeHttpThermometer": "node Devices/Thermometer/initializeHttpThermometer.js",
     "initializeMqttThermometer": "node Devices/Thermometer/initializeMqttThermometer.js",
     "deleteMqttThermometer": "node Devices/Thermometer/deleteMqttThermometer.js",
-
     "initializeHttpMotion": "node Devices/Motion/initializeHttpMotion.js",
     "initializeMqttMotion": "node Devices/Motion/initializeMqttMotion.js",
-
     "initializeMqttBell": "node Devices/Bell/initializeMqttBell.js",
     "initializeHttpBell": "node Devices/Bell/initializeHttpBell.js",
     "updateMqttBell": "node Devices/Bell/updateMqttBell.js",
     "updateHttpBell": "node Devices/Bell/updateHttpBell.js",
-
     "initializeMqttLamp": "node Devices/Lamp/initializeMqttLamp.js",
     "initializeHttpLamp": "node Devices/Lamp/initializeHttpLamp.js",
     "updateMqttLamp": "node Devices/Lamp/updateMqttLamp.js",
     "updateHttpLamp": "node Devices/Lamp/updateHttpLamp.js",
-
     "initializeMqttDoor": "node Devices/Door/initializeMqttDoor.js",
     "initializeHttpDoor": "node Devices/Door/initializeHttpDoor.js",
     "updateMqttDoor": "node Devices/Door/updateMqttDoor.js",
     "updateHttpDoor": "node Devices/Door/updateHttpDoor.js",
-
     "initializeMqttThermometerByModel": "node Devices/createDeviceByModel.js"
   },
   "author": "",
@@ -33,6 +29,7 @@
   "dependencies": {
     "axios": "^0.26.1",
     "express": "^4.17.3",
-    "hbs": "^4.2.0"
+    "hbs": "^4.2.0",
+    "nodemon": "^2.0.16"
   }
 }

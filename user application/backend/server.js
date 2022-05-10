@@ -1,0 +1,11 @@
+const express = require("express");
+const app = express();
+const indexController = require("./controllers/indexController");
+const path = require("path");
+console.log(path.join(__dirname, '..', 'frontend', 'public'));
+app.use(express.static(path.join(__dirname, '..', 'frontend', 'public')));
+app.set('views', path.join(__dirname, '..', 'frontend', 'views'));
+app.set("view engine", "hbs");
+app.use(express.urlencoded({ extended: false }));
+app.get("/index", indexController.index);
+app.listen(80);
