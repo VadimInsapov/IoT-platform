@@ -21,10 +21,28 @@ class EntitiesController {
 			}
 			else
 			{
-				const {_id, attributes} = req.body;
-				const type = _id.split(':')[1];
+				const {type, attributes} = req.body;
 				var EntityModel = mongoose.model(type, EntitySchema)
-				EntityModel.findById(_id) .exec( function(err, found_entity) {
+				const last_entity = await EntityModel.find().sort({_id:-1}).limit(1).lean();
+				let empty_object = true;
+				for (let key in last_entity) {
+					empty_object = false;
+					break;
+				}
+				let _id = ""
+				if (empty_object) _id = "broker:" + type + ":001"
+					else{
+					const id_num = Number(last_entity[0]._id.split(':')[2])+1
+					if(id_num<10)
+					{
+						_id = "broker:" + type + ":00" + id_num
+					}
+					else if (id_num < 100) {
+						_id = "broker:" + type + ":0" + id_num
+					}
+					else _id = "broker:" + type + ":" + id_num
+				}
+					EntityModel.findById(_id) .exec( function(err, found_entity) {
 					if (err) { return next(err); }
 						if (found_entity) {
 							res.send("entity already exist");

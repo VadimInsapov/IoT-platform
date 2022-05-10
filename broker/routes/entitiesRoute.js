@@ -9,7 +9,6 @@ const oneAttributeValidator = require('../mongodb/oneAttributeValidator')
 
 
 router.get('/', entitiesController.getAllEntities );
-
 router.post('/', 
 	entityValidator.validate,
 	entitiesController.createEntity 

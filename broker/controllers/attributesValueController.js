@@ -1,6 +1,6 @@
 const EntitySchema = require ("../mongodb/entitySchema.js")
 const mongoose = require('mongoose')
-
+const checkSubscriptions = require('../subs/checkSubs.js')
 
 class AttributeValueController {
 	async getAttributeValue (req, res) {
@@ -46,9 +46,12 @@ class AttributeValueController {
 			if(!right_type) return res.send("uncorrect type of value")
 			entity[req.params.name]["value"] = value
 			await EntityModel.replaceOne({_id: req.params.id}, entity)
-			res.send(entity)
+			
+			//console.log(checkSubscriptions(req.params.id, req.params.name, value))
+			res.send(checkSubscriptions({_id : req.params.id, attr: req.params.name, value: value}))
+			//res.send(entity)
 		} catch(e) {
-			res.send(`entities id=${req.params.id} attrs name=${req.params.name} value ${req.method} error`);
+			//res.send(`entities id=${req.params.id} attrs name=${req.params.name} value ${req.method} error`);
 		}
 	}
 

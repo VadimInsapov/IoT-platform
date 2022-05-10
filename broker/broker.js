@@ -13,8 +13,7 @@ const client = new MongoClient('mongodb://127.0.0.1', { useUnifiedTopology: true
 
 broker.use(jsonParser)
 broker.use(expressValidator())
-broker.use('/v2', router)
-broker.use("/entities", entitiesRouter);
+broker.use('/iot', router)
 
 
 const start = async ()=>{

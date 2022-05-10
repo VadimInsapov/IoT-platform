@@ -4,7 +4,6 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient('mongodb://127.0.0.1');
 
 class TypesController {
-	//no
 	async getAllTypes (req, res){
 		try{
 			client.connect().then(client =>
@@ -24,7 +23,7 @@ class TypesController {
 	async getType (req, res) {
 		try{
 			var EntityModel = mongoose.model(req.params.type, EntitySchema)
-			const entities = await EntityModel.find()
+			const entities = await EntityModel.find().lean()
 			return res.json(entities)
 		}catch(e){
 			res.send(`types type=${req.params.type} ${req.method} error`);

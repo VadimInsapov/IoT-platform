@@ -1,16 +1,16 @@
 const {body} = require('express-validator/check');
 
 exports.validate = [
-	body('_id')
-		.not().isEmpty().withMessage('id is required')
-		.matches(/broker:.+?:\d{3}/).withMessage("invalid id"),
+	// body('_id')
+	// 	.not().isEmpty().withMessage('id is required')
+	// 	.matches(/broker:.+?:\d{3}/).withMessage("invalid id"),
 	body('type')
 		.not().isEmpty()
-		.withMessage('type is required')
-		.custom((value, {req}) => value === (req.body._id).split(':')[1])
-		.withMessage("invalid type"),
+		.withMessage('type is required'),
+		// .custom((value, {req}) => value === (req.body._id).split(':')[1])
+		// .withMessage("invalid type"),
 	body('attributes')
-		.optional({checkFalsy: true})
+		.not().isEmpty().withMessage('attribute value is required')
 		.isArray().withMessage('attributes field is not array'),
 	body('attributes.*.*.value')
 		.not().isEmpty().withMessage('attribute value is required'),
