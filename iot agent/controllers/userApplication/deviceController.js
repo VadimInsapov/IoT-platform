@@ -18,16 +18,18 @@ exports.addDevice = function (mqttClient) {
         if (protocol === "MQTT") {
             mqttClient.subscribe(`/${deviceId}/attributes`);
         }
-        const iotAgentDevice = new IoTAgentDevice(request.body);
-        iotAgentDevice.save();
-        logger.showAll(IoTAgentDevice);
         const Device = mongoose.model(entityType, objectScheme);
         const device = new Device(objectPreparer(request.body));
-        device.save(function (err) {
+        device.save(function (err, doc) {
             if (err) return logger.showError(err);
+            const entityName = doc["_id"];
+            if (!("entityName" in request.body)) request.body = {...request.body, entityName}
+            const iotAgentDevice = new IoTAgentDevice(request.body);
+            iotAgentDevice.save();
             logger.deviceWasMadeByUser(deviceId);
+            logger.showAll(IoTAgentDevice);
+            response.status(200).json(`The IoTAgentDevice ${deviceId} was made`);
         });
-        response.status(200).json(`The IoTAgentDevice ${deviceId} was made`);
     }
 };
 
@@ -53,7 +55,6 @@ exports.addDeviceByModel = function (mqttClient) {
         module.exports.addDevice(mqttClient)(request, response);
     }
 };
-
 
 
 exports.deleteDevice = function (mqttClient) {
@@ -89,10 +90,18 @@ exports.validate = (method) => {
             .custom(deviceId => !IoTAgentDevice.find(deviceId))
             .withMessage('The deviceId already in use'),
         body('entityName')
-            .not().isEmpty()
-            .withMessage('The entityType is required')
+            .optional({checkFalsy: true})
+            // .not().isEmpty()
+            // .withMessage('The entityType is required')
             .matches(/broker:.+?:\d{3}/)
             .withMessage("Invalid entityName")
+            .custom((value, {req}) => {
+                if ("entityType" in req.body){
+                    return value.split(':')[1] === (req.body.entityType)
+                }
+                return true;
+            })
+            .withMessage("Invalid entityName, check entityType")
             .custom(entityName => !IoTAgentDevice.findDeviceByEntityName(entityName))
             .withMessage('The entityName already in use'),
         body('relationships')
@@ -124,9 +133,7 @@ exports.validate = (method) => {
                     .withMessage("Invalid endpoint"),
                 body('entityType')
                     .not().isEmpty()
-                    .withMessage('The entityType is required')
-                    .custom((value, {req}) => value === (req.body.entityName).split(':')[1])
-                    .withMessage("Invalid entityType, check entityName"),
+                    .withMessage('The entityType is required'),
                 body('transport')
                     .not().isEmpty()
                     .withMessage('The transport is required')
