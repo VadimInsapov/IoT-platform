@@ -56,6 +56,17 @@ exports.addDeviceByModel = function (mqttClient) {
     }
 };
 
+exports.index = function (request, response) {
+    if ("form" in request.query) {
+        const {form} = request.query;
+        if (form === "short"){
+            response.status(200).json(IoTAgentDevice.getAllShort());
+            return;
+        }
+    }
+    console.log(IoTAgentDevice.getAll());
+    response.status(200).json(Object.fromEntries(IoTAgentDevice.getAll()));
+}
 
 exports.deleteDevice = function (mqttClient) {
     return function (request, response) {
@@ -96,7 +107,7 @@ exports.validate = (method) => {
             .matches(/broker:.+?:\d{3}/)
             .withMessage("Invalid entityName")
             .custom((value, {req}) => {
-                if ("entityType" in req.body){
+                if ("entityType" in req.body) {
                     return value.split(':')[1] === (req.body.entityType)
                 }
                 return true;

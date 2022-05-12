@@ -57,6 +57,14 @@ module.exports = class IoTAgentDevice {
     static getAll() {
         return IoTAgentDevices;
     }
+    static getAllShort() {
+        const obj = {}
+        for (let [key, value] of IoTAgentDevices) {
+            obj[key] = value.entityName;
+        }
+        return obj;
+    }
+
 
     getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands) {
         let a = {};

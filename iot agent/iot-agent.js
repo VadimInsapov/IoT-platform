@@ -13,6 +13,7 @@ const mongoose = require("mongoose");
 
 appSouth.use(jsonParser);
 appSouth.use(expressValidator());
+appSouth.get("/devices", deviceController.index);
 appSouth.post("/devices", deviceController.validate('addDevice'), deviceController.addDevice(mqttClient));
 appSouth.post("/devices/model", deviceController.validate('addDeviceByModel'), deviceController.addDeviceByModel(mqttClient));
 appSouth.delete("/devices/:deviceId", deviceController.validate('deleteDevice'), deviceController.deleteDevice(mqttClient));
