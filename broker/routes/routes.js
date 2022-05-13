@@ -10,6 +10,10 @@ const agentRouter = require('./agentRoute')
 router.get('/', function (req, res) {
   res.send('entry point get');
 });
+router.post('/', function(req, res) {
+  alert(JSON.stringify( req.body))
+})
+
 router.use("/entities", entitiesRouter);
 router.use("/types", typesRouter);
 router.use("/subscriptions", subscriptionsRouter);

@@ -48,10 +48,14 @@ class AttributeValueController {
 			await EntityModel.replaceOne({_id: req.params.id}, entity)
 			
 			//console.log(checkSubscriptions(req.params.id, req.params.name, value))
-			res.send(checkSubscriptions({_id : req.params.id, attr: req.params.name, value: value}))
-			//res.send(entity)
+			let changes = {_id: req.params.id}
+			changes[req.params.name] = entity[req.params.name]
+			//changes = Object.assign(changes, entity[req.params.name])
+			//res.send(changes)
+			checkSubscriptions(changes)
+			res.send(entity)
 		} catch(e) {
-			//res.send(`entities id=${req.params.id} attrs name=${req.params.name} value ${req.method} error`);
+			res.send(`entities id=${req.params.id} attrs name=${req.params.name} value ${req.method} error`);
 		}
 	}
 

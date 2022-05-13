@@ -4,10 +4,38 @@ const {validationResult} = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
 const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient('mongodb://127.0.0.1');
+const checkSubscriptions = require('../subs/checkSubs.js')
 
 class EntitiesController {
 	async getAllEntities (req, res) {
-		try{ res.send(`entities ${req.method} `)
+		try{ 	
+			let collection_names = new Array()
+			if(req.query.hasOwnProperty("type")){
+				collection_names = req.query.type.split(",")
+			}
+			else {
+				collection_names = 
+				await client.connect().then(client =>
+					client.db('diploma_try').listCollections().toArray())
+						.then(async cols => {
+							let collections = new Array()
+							for(let col of cols){
+								collections.push(col.name)
+							}
+							return collections
+						})
+						.finally(() => client.close());
+				collection_names.splice(collection_names.indexOf("subs"), 1)
+				collection_names.splice(collection_names.indexOf("time_subs"), 1)
+			}
+			let entities = new Array()
+			for(let collection of collection_names)
+			{
+				var EntityModel = mongoose.model(collection, EntitySchema)
+				const entitiesOfType = await EntityModel.find().lean()
+				entities = entities.concat(entitiesOfType)
+			}
+			res.send(entities)
 		} catch(e){
 			res.send(`entities ${req.method} error`);
 		}
@@ -108,6 +136,9 @@ class EntitiesController {
 			}
 			new_entity = Object.assign(new_entity, req.body)
 			await EntityModel.replaceOne({_id: req.params.id}, new_entity)
+			let changes = new_entity
+			//console.log(changes)
+			checkSubscriptions(changes)
 			res.send(new_entity)
 		}
 	}
@@ -122,11 +153,16 @@ class EntitiesController {
 			const type = req.params.id.split(':')[1];
 			var EntityModel = mongoose.model(type, EntitySchema)
 			const entity = await EntityModel.findById({_id: req.params.id}).lean()
+			let changes = {_id: req.params.id}
 			for(let attr in req.body)
 			{
 					entity[attr] = req.body[attr]
+					changes[attr] =  req.body[attr]
 			}
 			await EntityModel.replaceOne({_id: req.params.id}, entity)
+			//changes = Object.assign(changes, entity[req.params.name])
+			//console.log(changes)
+			checkSubscriptions(changes)
 			res.send(entity)
 		}
 	}
@@ -141,14 +177,19 @@ class EntitiesController {
 			const type = req.params.id.split(':')[1];
 			var EntityModel = mongoose.model(type, EntitySchema)
 			const entity = await EntityModel.findById({_id: req.params.id}).lean()
+			let changes = {_id: req.params.id}
 			for(let attr in req.body)
 			{
 				if(attr in entity)
 				{
 					entity[attr] = req.body[attr]
+					changes[attr] =  req.body[attr]
 				}
 			}
 			await EntityModel.replaceOne({_id: req.params.id}, entity)
+			//changes = Object.assign(changes, entity[req.params.name])
+			//console.log(changes)
+			checkSubscriptions(changes)
 			res.send(entity)
 		}
 	}

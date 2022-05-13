@@ -2,6 +2,10 @@ const EntitySchema = require ("../mongodb/entitySchema.js")
 const mongoose = require('mongoose')
 const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient('mongodb://127.0.0.1');
+const fetch = require('node-fetch');
+const { body } = require("express-validator/check");
+const CheckTimeSub = require('../subs/timeSubs')
+const CronJob = require('cron').CronJob;
 
 class TypesController {
 	async getAllTypes (req, res){
@@ -22,11 +26,24 @@ class TypesController {
 
 	async getType (req, res) {
 		try{
-			var EntityModel = mongoose.model(req.params.type, EntitySchema)
-			const entities = await EntityModel.find().lean()
-			return res.json(entities)
+			const time_sub = {
+				"_id": "broker:subs:001",
+				"subject": [
+					{
+						"idPattern": "broker:type4:00.",
+						"typePattern": "type4",
+						"attrs": [
+							"attr1"
+						],
+						"condition": "attr1<100"
+					}
+				],
+			}
+			const job = new CronJob(`0 * * * * *`, CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
+			job.start();			
 		}catch(e){
 			res.send(`types type=${req.params.type} ${req.method} error`);
+			console.log(e)
 		}
 	}
 }

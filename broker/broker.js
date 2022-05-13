@@ -7,6 +7,7 @@ const expressValidator = require('express-validator')
 const jsonParser = express.json();
 const {MongoClient} = require('mongodb')
 
+
 const PORT = 5500
 const DB = 'mongodb://127.0.0.1/diploma_try'
 const client = new MongoClient('mongodb://127.0.0.1', { useUnifiedTopology: true });

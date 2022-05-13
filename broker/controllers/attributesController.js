@@ -2,6 +2,7 @@ const EntitySchema = require ("../mongodb/entitySchema.js")
 const mongoose = require('mongoose')
 const {body, validationResult} = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
+const checkSubscriptions = require('../subs/checkSubs.js')
 
 
 class AtributesController {
@@ -11,6 +12,7 @@ class AtributesController {
 			var EntityModel = mongoose.model(type, EntitySchema)
 			const entity = await EntityModel.findById({_id: req.params.id}).lean()
 			res.send(entity[req.params.name])
+			
 		} catch(e) {
 			res.send(`entities id=${req.params.id} attrs name=${req.params.name} ${req.method} error`);
 		}
@@ -58,6 +60,11 @@ class AtributesController {
 				"value": value
 			}
 			await EntityModel.replaceOne({_id: req.params.id}, entity)
+			let changes = {_id: req.params.id}
+			changes[req.params.name] = entity[req.params.name]
+			//changes = Object.assign(changes, entity[req.params.name])
+			//console.log(changes)
+			checkSubscriptions(changes)
 			res.send(entity)
 		}
 	}

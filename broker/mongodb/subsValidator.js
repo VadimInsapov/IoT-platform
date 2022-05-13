@@ -11,11 +11,18 @@ exports.validate = [
 		.optional(),
 	// body('subject.entities')
 	// 	.isArray().withMessage('entities field is not array'),
-	body('subject.entities.*.idPattern')
+	// body('subject.entities.*.idPattern')
+	// 	.not().isEmpty().withMessage('idPattern is required'),
+	// body('subject.entities.*.typePattern')
+	// 	.not().isEmpty().withMessage('typePattern is required'),
+	// body('subject.entities.*.attrs')
+	// 	.not().isEmpty().withMessage('attrs is required')
+	// 	.isArray().withMessage('attributes field is not array'),
+	body('subject.*.idPattern')
 		.not().isEmpty().withMessage('idPattern is required'),
-	body('subject.entities.*.typePattern')
+	body('subject.*.typePattern')
 		.not().isEmpty().withMessage('typePattern is required'),
-	body('subject.entities.*.attrs')
+	body('subject.*.attrs')
 		.not().isEmpty().withMessage('attrs is required')
 		.isArray().withMessage('attributes field is not array'),
 	// body('subject.condition')

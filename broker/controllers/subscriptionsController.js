@@ -2,17 +2,21 @@ const SubscriptionSchema = require ("../mongodb/subsSchema")
 const mongoose = require('mongoose')
 const {validationResult} = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
+const CreateTimeSub = require('../subs/timeSubs')
 
 class SubscriptionsController {
 	async getAllSubscriptions(req, res) {
 		var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
-		const subs = await SubscriptionModel.find()
-		return res.json(subs)
+		let subs = await SubscriptionModel.find().lean()
+		SubscriptionModel = mongoose.model("time_subs", SubscriptionSchema)
+		const time_subs = await SubscriptionModel.find().lean()
+		subs = Object.assign(subs, time_subs)
+		res.send(subs)
 	}catch(e){
 		res.send(`subscriptions ${req.method} error`);
 }
 
-async createSubscription (req, res) {
+	async createSubscription (req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
 			sendResponseWithErrors(res, errors);
@@ -55,6 +59,7 @@ async createSubscription (req, res) {
 						sub = Object.assign(sub, req.body)
 						SubscriptionModel.create(sub);
 						res.send(sub)
+						CreateTimeSub(sub)
 					}
 			});
 		}
@@ -62,7 +67,8 @@ async createSubscription (req, res) {
 
 	async getSubscription(req, res) {
 		try{
-			var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
+			const type = req.params.id.split(':')[1];
+			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const sub = await SubscriptionModel.findById(req.params.id, '-__v')
 			return res.json(sub)
 		} catch(e){
@@ -73,7 +79,7 @@ async createSubscription (req, res) {
 	async deleteSubscription(req, res) {
 		try{
 			const type = req.params.id.split(':')[1];
-			var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
+			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const sub = await SubscriptionModel.findByIdAndDelete(req.params.id)
 			return res.json(sub)
 		} catch(e){
@@ -82,18 +88,21 @@ async createSubscription (req, res) {
 	}
 
 	async updateSubscription(req, res) {
-		// const errors = validationResult(req);
-		// if (!errors.isEmpty()) {
-		// 	sendResponseWithErrors(res, errors);
-		// 	return;
-		// }
-		// else{
-			var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
-			let sub = await SubscriptionModel.findById({_id: req.params.id}).lean()
-			sub = Object.assign(req.body, sub)
-			await SubscriptionModel.replaceOne({_id: req.params.id}, sub)
-			res.send(sub)
-		//}
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			sendResponseWithErrors(res, errors);
+			return;
+		}
+		else{
+			const type = req.params.id.split(':')[1];
+			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
+			let new_sub = {
+				"_id": req.params.id
+			}
+			new_sub = Object.assign(new_sub, req.body)
+			await SubscriptionModel.replaceOne({_id: req.params.id}, new_sub)
+			res.send(new_sub)
+		}
 	}
 }
 
