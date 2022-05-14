@@ -59,7 +59,7 @@ class SubscriptionsController {
 						sub = Object.assign(sub, req.body)
 						SubscriptionModel.create(sub);
 						res.send(sub)
-						CreateTimeSub(sub)
+						if (type == "time_subs") CreateTimeSub(sub)
 					}
 			});
 		}

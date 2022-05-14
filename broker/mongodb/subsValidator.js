@@ -22,9 +22,9 @@ exports.validate = [
 		.not().isEmpty().withMessage('idPattern is required'),
 	body('subject.*.typePattern')
 		.not().isEmpty().withMessage('typePattern is required'),
-	body('subject.*.attrs')
-		.not().isEmpty().withMessage('attrs is required')
-		.isArray().withMessage('attributes field is not array'),
+	// body('subject.*.attrs')
+	// 	.not().isEmpty().withMessage('attrs is required')
+	// 	.isArray().withMessage('attributes field is not array'),
 	// body('subject.condition')
 	// 	.not().isEmpty().withMessage('condition is required'),
 	body('subject.condition.expression')
