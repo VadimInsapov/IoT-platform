@@ -1,11 +1,7 @@
 const SubscriptionSchema = require("../mongodb/subsSchema")
 const mongoose = require('mongoose');
-const { type } = require("express/lib/response");
-const MongoClient = require("mongodb").MongoClient;
-const client = new MongoClient('mongodb://127.0.0.1');
 const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
-
 
 async function CheckSubscriptionsWithChanges(changes) {
 	var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
@@ -63,7 +59,6 @@ async function CheckSubscriptionsWithChanges(changes) {
 			}).then(response => {
 				return response.json()
 			})
-			//console.log(handler_response)
 		}
 		if (sub.hasOwnProperty("notification")) {
 			const notification_response = await fetch(sub.notification.url, {
@@ -75,7 +70,6 @@ async function CheckSubscriptionsWithChanges(changes) {
 			}).then(response => {
 				return response.json()
 			})
-			//console.log(notification_response)
 		}
 	}
 	return subscriptions

@@ -7,27 +7,26 @@ const entityValidator = require('../mongodb/entityValidator')
 const attributeValidator = require('../mongodb/attributeValidator')
 const oneAttributeValidator = require('../mongodb/oneAttributeValidator')
 
-
-router.get('/', entitiesController.getAllEntities );
-router.post('/', 
+router.get('/', entitiesController.getAllEntities);
+router.post('/',
 	entityValidator.validate,
-	entitiesController.createEntity 
-	);
+	entitiesController.createEntity
+);
 
-router.get('/:id', entitiesController.getEntity );
-router.delete('/:id', entitiesController.deleteEntity );
+router.get('/:id', entitiesController.getEntity);
+router.delete('/:id', entitiesController.deleteEntity);
 
-router.get('/:id/attrs',entitiesController.getEntityAttributes);
-router.put('/:id/attrs', 
+router.get('/:id/attrs', entitiesController.getEntityAttributes);
+router.put('/:id/attrs',
 	attributeValidator.validate,
-	entitiesController.replaceAllEntityAttributes );
+	entitiesController.replaceAllEntityAttributes);
 router.post('/:id/attrs', attributeValidator.validate,
-	entitiesController.updateOrAppendEntityAttributes );
+	entitiesController.updateOrAppendEntityAttributes);
 router.patch('/:id/attrs', attributeValidator.validate,
-	entitiesController.updateExistingEntityAttributes );
+	entitiesController.updateExistingEntityAttributes);
 
-router.get('/:id/attrs/:name', atributesController.getAttributeData );
-router.post('/:id/attrs/:name', 
+router.get('/:id/attrs/:name', atributesController.getAttributeData);
+router.post('/:id/attrs/:name',
 	oneAttributeValidator.validate,
 	atributesController.updateAttributeData);
 router.delete('/:id/attrs/:name', atributesController.deleteAttribute);

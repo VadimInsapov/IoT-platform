@@ -3,7 +3,6 @@ const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
 
 function CreateTimeSub(time_sub) {
-	// console.log(`* ${time_sub.time.split(':')[1]} ${time_sub.time.split(':')[0]} * * *`)
 	const job = new CronJob(`0 ${time_sub.time.split(':')[1]} ${time_sub.time.split(':')[0]} * * *`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
 	job.start();
 }
@@ -46,7 +45,6 @@ async function CheckTimeSub(time_sub) {
 			// type: "number",
 			// value: 0
 		}
-		//console.log(data)
 		const handler_response = await fetch(`http://127.0.0.1:5500/iot/entities/${sub.handler.id}/attrs`, {
 			method: "PATCH",
 			headers: {
@@ -56,7 +54,6 @@ async function CheckTimeSub(time_sub) {
 		}).then(response => {
 			return response.json()
 		})
-		//console.log(handler_response)
 	}
 	if (time_sub.hasOwnProperty('notification') && true_condition) {
 		const notification_response = await fetch(sub.notification.url, {
@@ -68,11 +65,7 @@ async function CheckTimeSub(time_sub) {
 		}).then(response => {
 			return response.json()
 		})
-		//console.log(notification_response)
-
-
 	}
-	console.log(new Date())
 }
 
 module.exports = CreateTimeSub
