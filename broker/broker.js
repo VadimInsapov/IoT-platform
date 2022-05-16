@@ -1,15 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const broker = express();
+const cors = require('cors')
 const router = require('./routes/routes')
 const expressValidator = require('express-validator')
 const jsonParser = express.json();
 const StartTimeSubs = require('./subs/startTimeSubs')
 
 const PORT = 5500
-const DB = 'mongodb://127.0.0.1/diploma_try'
+const DB = 'mongodb://127.0.0.1/things'
 
 broker.use(jsonParser)
+broker.use(cors())
 broker.use(expressValidator())
 broker.use('/iot', router)
 

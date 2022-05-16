@@ -63,7 +63,6 @@ export function createSelect(defaultText, array, object = {}) {
     if (id) {
         select.id = id;
     }
-    console.log(array)
     for (const item of array) {
         const option = document.createElement("option");
         option.text = item.text;
