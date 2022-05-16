@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require('cors')
 const appSouth = express();
 const appNorth = express();
 const jsonParser = express.json();
@@ -12,6 +13,7 @@ const brokerController = require('./controllers/broker/brokerController');
 const mongoose = require("mongoose");
 
 appSouth.use(jsonParser);
+appSouth.use(cors());
 appSouth.use(expressValidator());
 appSouth.get("/devices", deviceController.index);
 appSouth.post("/devices", deviceController.validate('addDevice'), deviceController.addDevice(mqttClient));
