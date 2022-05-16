@@ -39,7 +39,7 @@
     position: relative;
 }
 
-.room__center {
+.block__center {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -104,6 +104,16 @@
     background-color: rgba(0, 0, 0, 0.8);
     top: 0;
     left: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all 0.5s ease 0s;
+}
+
+.popup.open {
+    opacity: 1;
+    visibility: visible;
 }
 
 .popup__body {
@@ -116,12 +126,16 @@
 
 .popup__content {
     background-color: white;
+    min-width: 400px;
     max-width: 800px;
     padding: 30px;
     position: relative;
 }
 
 .popup__close {
+    position: absolute;
+    right: 11px;
+    top: 11px;
 }
 
 .popup__title {
@@ -129,9 +143,33 @@
     margin-bottom: 20px;
 }
 
-.popup__selection{
+.popup__selection {
     margin-bottom: 12px;
 }
+
 .popup__text {
     font-size: 22px;
 }
+
+.block {
+    width: 75vw;
+    margin: 20px auto;
+}
+
+.room-settings {
+    width: 27%;
+}
+
+.room-info {
+    width: 71%;
+}
+
+.scripts {
+    gap: 1%;
+    row-gap: 2.5vh;
+}
+
+.script {
+    width: 32%;
+}
+
