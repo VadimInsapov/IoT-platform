@@ -1,4 +1,4 @@
-const {body} = require('express-validator/check');
+const { body } = require('express-validator/check');
 
 exports.validate = [
 	body('value')
@@ -6,4 +6,4 @@ exports.validate = [
 	body('type')
 		.not().isEmpty().withMessage('attribute type is required')
 		.isIn(['number', 'text', 'boolean', 'array', 'relationship']).withMessage('type is unknown'),
-]	
+]

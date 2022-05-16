@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cron": "^2.0.0",
     "express": "^4.17.3",
     "express-validator": "^5.3.0",
     "mongoose": "^6.2.10",
+    "node-fetch": "^2.6.7",
     "nodemon": "^2.0.15"
   }
 }
