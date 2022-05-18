@@ -1,3 +1,4 @@
+require('dotenv').config()
 const SubscriptionSchema = require("../mongodb/subsSchema")
 const mongoose = require('mongoose');
 const fetch = require('node-fetch');
@@ -43,16 +44,18 @@ async function CheckSubscriptionsWithChanges(changes) {
 	for (let sub of right_subs) {
 		if (sub.hasOwnProperty("handler")) {
 			let data = {}
-			data[sub.handler.command] = {
-				type: "command",
-				value: ""
-				// type: "number",
-				// value: 0
-			}
+			// data[sub.handler.command] = {
+			// 	type: "command",
+			// 	value: ""
+			// 	// type: "number",
+			// 	// value: 0
+			// }
+			data[id]=sub.handler.id
+			data[command]=sub.handler.command
 			console.log(data)
-			const handler_response = await fetch(`http://127.0.0.1:5500/iot/entities/${sub.handler.id}/attrs`, {
-				method: "PATCH",
-				headers: {
+			const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
+				method: "POST",
+					headers: {
 					'Content-Type': 'application/json;charset=utf-8'
 				},
 				body: JSON.stringify(data)

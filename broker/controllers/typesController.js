@@ -1,11 +1,12 @@
+require('dotenv').config()
 const MongoClient = require("mongodb").MongoClient;
-const client = new MongoClient('mongodb://127.0.0.1');
+const client = new MongoClient(`mongodb://${process.env.LOCALHOST}`);
 
 class TypesController {
 	async getAllTypes(req, res) {
 		try {
 			client.connect().then(client =>
-				client.db('things').listCollections().toArray())
+				client.db(`${process.env.DB_NAME}`).listCollections().toArray())
 				.then(cols => {
 					let collection_names = new Array()
 					for (let col of cols) {
