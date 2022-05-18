@@ -5,7 +5,7 @@ class TypesController {
 	async getAllTypes(req, res) {
 		try {
 			client.connect().then(client =>
-				client.db('diploma_try').listCollections().toArray())
+				client.db('things').listCollections().toArray())
 				.then(cols => {
 					let collection_names = new Array()
 					for (let col of cols) {

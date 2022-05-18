@@ -16,7 +16,7 @@ class EntitiesController {
 			else {
 				collection_names =
 					await client.connect().then(client =>
-						client.db('diploma_try').listCollections().toArray())
+						client.db('things').listCollections().toArray())
 						.then(async cols => {
 							let collections = new Array()
 							for (let col of cols) {
@@ -74,11 +74,12 @@ class EntitiesController {
 				}
 				else {
 					let entity = {
-						"_id": _id
+						"_id": _id,
 					}
 					for (let attr of attributes) {
 						entity = Object.assign(entity, attr)
 					}
+					console.log(entity);
 					EntityModel.create(entity);
 					res.send(entity)
 				}
