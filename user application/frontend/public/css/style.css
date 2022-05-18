@@ -39,6 +39,11 @@
     position: relative;
 }
 
+.room:hover {
+    cursor: pointer;
+    background-color: #ccc;
+}
+
 .block__center {
     position: absolute;
     top: 50%;
@@ -84,6 +89,8 @@
     padding: 8px 0px;
     flex-grow: 6;
     /*width: 50%;*/
+    overflow: hidden;
+    text-overflow: ellipsis;
     text-align: center;
 }
 

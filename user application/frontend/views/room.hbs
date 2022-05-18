@@ -24,14 +24,38 @@
         </div>
         <div class="room-info p-5  rounded-3  border border-secondary border-2 ">
             <ul class="list-group mb-2">
-                <li class="list-group-item fs-6">Описание</li>
+                <li class="list-group-item fs-6">{{room.roomDescription.value}}</li>
             </ul>
             <ul class="list-group list-group-horizontal mb-2">
                 <li class="list-group-item list-group-item-primary">
                     <div class="fs-6">Тип комнаты</div>
                 </li>
                 <li class="list-group-item">
-                    <div class="fs-6">Ванна</div>
+                    <div class="fs-6">{{room.roomType.value}}</div>
+                </li>
+            </ul>
+            <ul class="list-group list-group-horizontal mb-2">
+                <li class="list-group-item list-group-item-primary">
+                    <div class="fs-6">Ширина</div>
+                </li>
+                <li class="list-group-item">
+                    <div class="fs-6">{{room.roomWeight.value}} м</div>
+                </li>
+            </ul>
+            <ul class="list-group list-group-horizontal mb-2">
+                <li class="list-group-item list-group-item-primary">
+                    <div class="fs-6">Длина</div>
+                </li>
+                <li class="list-group-item">
+                    <div class="fs-6">{{room.roomLength.value}} м</div>
+                </li>
+            </ul>
+            <ul class="list-group list-group-horizontal mb-2">
+                <li class="list-group-item list-group-item-primary">
+                    <div class="fs-6">Высота</div>
+                </li>
+                <li class="list-group-item">
+                    <div class="fs-6">{{room.roomHeight.value}} м</div>
                 </li>
             </ul>
         </div>
