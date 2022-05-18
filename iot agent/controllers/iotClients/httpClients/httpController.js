@@ -1,5 +1,6 @@
 const IoTAgentDevice = require("../../../models/IoTAgentDevice.js");
 const matcherDB = require("../matcherDB");
+const sendIdAndAttributesToBroker = require("../sendIdAndAttributesToBroker");
 const logger = require("../../logger");
 const mongoose = require("mongoose");
 const objectScheme = require("../../../models/ObjectScheme");
@@ -20,5 +21,6 @@ exports.matchFromDevicesAndSendDataToDB = (request, response) => {
     const Device = mongoose.model(entityType, objectScheme);
     Device.findByIdAndUpdate(brokerId, newAttributes, logger.showError);
     logger.send(brokerId, newAttributes);
+    sendIdAndAttributesToBroker(brokerId, newAttributes);
     response.status(200).json("Data was sent!");
 }

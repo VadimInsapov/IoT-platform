@@ -28,7 +28,7 @@ exports.addDevice = function (mqttClient) {
             iotAgentDevice.save();
             logger.deviceWasMadeByUser(deviceId);
             logger.showAll(IoTAgentDevice);
-            response.status(200).json(`The IoTAgentDevice ${deviceId} was made`);
+            response.status(200).json(request.body);
         });
     }
 };

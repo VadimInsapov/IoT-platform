@@ -4,12 +4,15 @@ module.exports = (body) => {
     if (name) {
         device["name"] = {
             type:"text",
-            value: entityName,
+            value: name,
         };
     }
     device["_id"] = entityName;
     for (const attribute of dynamicAttributes) {
-        device[attribute.name] = 'null';
+        device[attribute.name] = {
+            type: attribute.type,
+            value: "",
+        };
     }
     for (const command of commands) {
         device[command.name] = {

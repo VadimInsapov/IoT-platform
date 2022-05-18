@@ -6,6 +6,7 @@ exports.getBrokerAttributes = (iotAgentDeviceValue, clientAttributes) => {
     let brokerNewAttributes = {};
     for (const mqttAttr in clientAttributes) {
         let newAttr = iotAgentAttributes[mqttAttr].name;
+        newAttr += ".value";
         let type = iotAgentAttributes[mqttAttr].type;
         let newValue = clientAttributes[mqttAttr];
         if (type === "number") {
