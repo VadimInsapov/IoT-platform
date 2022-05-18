@@ -1,3 +1,4 @@
+require('dotenv').config()
 const CronJob = require('cron').CronJob;
 const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
@@ -16,13 +17,13 @@ async function CheckTimeSub(time_sub) {
 			const idPattern = new RegExp(subject.idPattern)
 			let conditions = new Array
 			conditions = subject.condition.split(";")
-			let existing_types = await fetch(`http://127.0.0.1:5500/iot/types`).then(response => {
+			let existing_types = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/types`).then(response => {
 				return response.json()
 			})
 			existing_types = Object.values(existing_types)
 			for (let type of existing_types) {
 				if (typePattern.test(type)) {
-					let entities = await fetch(`http://127.0.0.1:5500/iot/entities?type=${type}`).then(response => {
+					let entities = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${type}`).then(response => {
 						return response.json()
 					})
 					for (let entity of entities) {
@@ -45,7 +46,7 @@ async function CheckTimeSub(time_sub) {
 			// type: "number",
 			// value: 0
 		}
-		const handler_response = await fetch(`http://127.0.0.1:5500/iot/entities/${sub.handler.id}/attrs`, {
+		const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${sub.handler.id}/attrs`, {
 			method: "PATCH",
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'
@@ -69,4 +70,3 @@ async function CheckTimeSub(time_sub) {
 }
 
 module.exports = CreateTimeSub
-

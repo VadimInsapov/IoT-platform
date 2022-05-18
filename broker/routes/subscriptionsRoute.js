@@ -3,7 +3,6 @@ const router = new Router()
 const subscriptionsController = require('../controllers/subscriptionsController')
 const subscriptionsValidator = require('../mongodb/subsValidator')
 
-
 router.get('/', subscriptionsController.getAllSubscriptions);
 router.post('/',
 	subscriptionsValidator.validate,

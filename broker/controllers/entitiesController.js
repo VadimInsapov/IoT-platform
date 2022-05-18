@@ -1,10 +1,10 @@
+require('dotenv').config()
 const EntitySchema = require("../mongodb/entitySchema.js")
 const mongoose = require('mongoose')
 const { validationResult } = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({ errors: errors.array() });
-const MongoClient = require("mongodb").MongoClient;
-const client = new MongoClient('mongodb://127.0.0.1');
 const checkSubscriptions = require('../subs/checkSubs.js')
+const fetch = require('node-fetch');
 
 class EntitiesController {
 	async getAllEntities(req, res) {
@@ -14,19 +14,13 @@ class EntitiesController {
 				collection_names = req.query.type.split(",")
 			}
 			else {
-				collection_names =
-					await client.connect().then(client =>
-						client.db('diploma_try').listCollections().toArray())
-						.then(async cols => {
-							let collections = new Array()
-							for (let col of cols) {
-								collections.push(col.name)
-							}
-							return collections
-						})
-						.finally(() => client.close());
-				collection_names.splice(collection_names.indexOf("subs"), 1)
-				collection_names.splice(collection_names.indexOf("time_subs"), 1)
+				collection_names = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/types`).then(response => {
+					return response.json()
+				})
+				if(collection_names.indexOf("subs")!=-1)
+					collection_names.splice(collection_names.indexOf("subs"), 1)
+				if(collection_names.indexOf("time_subs")!=-1)
+					collection_names.splice(collection_names.indexOf("time_subs"), 1)
 			}
 			let entities = new Array()
 			for (let collection of collection_names) {
