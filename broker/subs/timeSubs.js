@@ -40,14 +40,16 @@ async function CheckTimeSub(time_sub) {
 	}
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
 		let data = {}
-		data[sub.handler.command] = {
-			type: "command",
-			value: ""
-			// type: "number",
-			// value: 0
-		}
-		const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${sub.handler.id}/attrs`, {
-			method: "PATCH",
+		// data[sub.handler.command] = {
+		// 	type: "command",
+		// 	value: ""
+		// 	// type: "number",
+		// 	// value: 0
+		// }
+		data[id]=sub.handler.id
+		data[command]=sub.handler.command
+		const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
+			method: "POST",
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'
 			},
