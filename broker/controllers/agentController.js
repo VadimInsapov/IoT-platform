@@ -1,9 +1,10 @@
-const checkSubscriptions = require('../subs/checkSubs.js')
+const checkInfoFromAgent = require('../subs/checkInfoFromAgent')
 
 class AgentController {
 	async GetChangesFromAgent(req, res) {
 		try {
-			checkSubscriptions(req.body)
+			checkInfoFromAgent(req.body)
+			res.send(req.body)
 		}
 		catch(e){
 			res.send(`agent ${req.method} error`);
