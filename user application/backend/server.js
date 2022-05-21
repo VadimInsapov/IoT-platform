@@ -28,6 +28,7 @@ app.get("/rooms/:roomId", roomController.index);
 app.post("/rooms", roomController.storeRoom);
 app.post("/rooms", roomController.storeRoom);
 app.delete("/rooms/:roomId", roomController.destroyRoom);
+app.get("/rooms/refs/device", roomController.addRef);
 app.post("/devices", deviceController.storeDevice);
 app.post("/devices/update", deviceController.updateDevice);
 app.delete("/devices/:entityName", deviceController.destroyDevice);
