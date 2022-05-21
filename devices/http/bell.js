@@ -11,6 +11,7 @@ const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
 const {actuatorSettings, deviceRoute} = fullDeviceInfo;
 console.log(fullDeviceInfo);
 app.post(deviceRoute, express.json(), function(request, response){
-    console.log(request.body);
+    const res = request.body.command === "ring" ? true : false;
+    if (res)   console.log('\x1b[32m%s\x1b[0m', "State has changed! The bell is ringing!");
 });
 app.listen(actuatorSettings.port);

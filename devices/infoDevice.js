@@ -33,8 +33,8 @@ const getIotAgentEndpoint = (macId) => {
     const {host, port} = getIoTAgentNorthSettings();
     return `http://${host}:${port}${process.env.IOT_AGENT_HOST_ROUTE}?deviceId=${macId}`;
 };
-const getHttpActuatorEndpoint = (macId) => {
-    const {host, port} = getHttpActuatorSettings();
+const getHttpActuatorEndpoint = (macId, name) => {
+    const {host, port} = getHttpActuatorSettings(name);
     return `http://${host}:${port}/${macId}/commands`;
 };
 const getHttpActuatorRoute = (macId) => {
@@ -65,16 +65,17 @@ module.exports.getDevice = (device) => {
             obj["iotAgentEndpoint"] = getIotAgentEndpoint(macAddress);
         }
         if (type === "Actuator") {
+            console.log(name)
             obj["actuatorSettings"] = getHttpActuatorSettings(name);
             obj["deviceRoute"] = getHttpActuatorRoute(macAddress);
-            obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress);
+            obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress, name);
         }
         if (type === "Gate") {
             obj["iotAgentSetting"] = getIoTAgentNorthSettings(macAddress);
             obj["iotAgentEndpoint"] = getIotAgentEndpoint(macAddress);
             obj["actuatorSettings"] = getHttpActuatorSettings(name);
             obj["deviceRoute"] = getHttpActuatorRoute(macAddress);
-            obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress);
+            obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress, name);
         }
     }
     if (functionForDataGenerate) obj["functionForDataGenerate"] = functionForDataGenerate;

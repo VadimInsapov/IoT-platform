@@ -26,17 +26,19 @@ const input = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
+
 function loop() {
     input.question("Enter command: ", (answer) => {
         answer = answer.toLowerCase();
         console.log(answer);
         if (answer === "comein") {
-            client.publish(topic, JSON.stringify(1))
+            client.publish(topic, JSON.stringify({c: 1}))
             console.log('\x1b[32m%s\x1b[0m', "The motion sensor detected someone!");
         }
         if (answer === "comeout") {
-            client.publish(topic, JSON.stringify(0))
-            console.log('\x1b[32m%s\x1b[0m', "No motion sensor detected!");;
+            client.publish(topic, JSON.stringify({c: 0}))
+            console.log('\x1b[32m%s\x1b[0m', "No motion sensor detected!");
+            ;
         }
         loop();
     });
