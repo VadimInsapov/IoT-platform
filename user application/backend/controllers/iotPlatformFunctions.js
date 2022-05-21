@@ -1,11 +1,23 @@
 const {default: axios} = require("axios");
 
-
+exports.updateCommandInAgent = (object) => {
+    return axios({
+        method: "post",
+        url: "http://localhost:4041/update",
+        data: object
+    }).then((res) => res.data);
+}
 exports.postDeviceInAgent = (object) => {
     return axios({
         method: "post",
         url: "http://localhost:4041/devices/model",
         data: object
+    }).then((res) => res.data);
+}
+exports.deleteDeviceInAgent = (entityName) => {
+    return axios({
+        method: "delete",
+        url: `http://localhost:4041/devices/${entityName}`,
     }).then((res) => res.data);
 }
 exports.postObjectInBroker = (object) => {
@@ -24,6 +36,13 @@ exports.getAllObjectsByType = (type) => {
 exports.getObjectById = (id) => {
     return axios({
         method: "get",
+        url: `http://localhost:5500/iot/entities/${id}`,
+    }).then((res) => res.data);
+}
+
+exports.deleteObjectById = (id) => {
+    return axios({
+        method: "DELETE",
         url: `http://localhost:5500/iot/entities/${id}`,
     }).then((res) => res.data);
 }
@@ -54,25 +73,3 @@ exports.createSubscriptionForDevice = (idPattern, typePattern, attributes, notif
         data: subscription
     }).then((res) => res.data);
 }
-
-/**
- * "description", - описание, строка, опционально
- * "time"
- * "subject": { - на что подписываемся, объект, обязательно
- * 	"entities": [ - массив сущностей, на которые подписываемся, обязательно
- * 		{
- * 			"idPattern", - либо явный айдишник ?только число или полностью?, либо регулярка, строка, обязательно
- * 			"typePattern" - либо явный тип, либо регулярка, строка, обязательно
- * 			"attrs": [] - массив атрибутов, за изменениями в которых будем следить, строки, обязательно
- * 			"condition": - условие реагирования
- * 		}
- * 	],
- * "handler": {
- * 	"id",
- * 	"command"
- * }
- * "notification": { - способ уведомления
- * 	"http_url", - куда отправляется уведомление
- * 	"attrsFormat"
- * }
- */

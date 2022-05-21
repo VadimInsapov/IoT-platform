@@ -15,7 +15,7 @@
 <div class="index d-flex">
     <div class="rooms border-end border-secondary border-2">
         <div class="index__menu">
-            <button id="createRoom" type="button" class="btn btn-success btn-lg">Создать комнату</button>
+            <button id="createPopupRoom" type="button" class="btn btn-success btn-lg">Создать комнату</button>
         </div>
         <div class="rooms__box d-flex flex-wrap justify-content-between">
             {{#each shortRooms}}
@@ -30,8 +30,8 @@
     </div>
     <div class="devices">
         <div class="index__menu">
-            <button id="createDevice" type="button" class="btn btn-success btn-lg">Создать устройство</button>
-            <button id="createScript" onclick="location.href='/scripts'" type="button" class="btn btn-warning btn-lg">
+            <button id="createPopupDevice" type="button" class="btn btn-success btn-lg">Создать устройство</button>
+            <button id="createScript" onclick="location.href='/scripts'" type="button" class="btn btn-success btn-lg">
                 Сценарии
             </button>
         </div>
@@ -42,7 +42,7 @@
                 {{#each deviceTypes}}
                     <option
                         {{#if this.isSelected}}
-                            selected
+                        selected
                         {{/if}}
                         value={{@key}}
                     >
@@ -55,20 +55,35 @@
             {{#each devices}}
                 <div id={{this._id}} class="device border border-secondary border-2 rounded">
                     <div class="device__title text-center fs-4">{{this.name.value}}</div>
+                    <div class="device__option">
+                        <div class="device__option-name fs-6 bg-warning text-dark rounded">Тип</div>
+                        <div class="device__option-value  border border-dark fs-6 bg-light text-dark  rounded">{{this.type}}</div>
+                    </div>
                     {{#each (getDeviceAttributes this)}}
-                        <div class="device__option">
-                            <div class="device__option-name fs-6 bg-warning text-dark rounded">{{this.[1].text}}</div>
-                            <div class="device__option-value fs-6 bg-light text-dark  rounded">
-                                {{#if this.[1].value}}
-                                    {{ this.[1].value}}
-                                {{else}}
-                                    нет данных
-                                {{/if}}
+                        {{#if (isCommand this.[1].type)}}
+                            <div class="text-center">
+                                <button
+                                        class="device__button-command {{this.[0]}} command w-100 btn btn-sm btn-dark"
+                                        type="button">
+                                    {{this.[1].text}}
+                                </button>
                             </div>
-                        </div>
+                        {{else}}
+                            <div class="device__option">
+                                <div class="device__option-name fs-6 bg-warning text-dark rounded">{{this.[1].text}}</div>
+                                <div class="{{this.[0]}} device__option-value border border-dark fs-6 bg-light text-dark  rounded">
+                                    {{#if this.[1].value}}
+                                        {{ this.[1].value}}
+                                    {{else}}
+                                        нет данных
+                                    {{/if}}
+                                </div>
+                            </div>
+                        {{/if}}
                     {{/each}}
                     <div class="text-center">
-                        <button type="button" class="device__button-delete btn btn-sm btn-danger">Удалить</button>
+                        <button type="button" class="device__button-delete btn btn-sm btn-danger">Удалить
+                        </button>
                     </div>
                 </div>
             {{/each}}
@@ -76,6 +91,7 @@
     </div>
 </div>
 {{> popup}}
-<script type="module" src="js/index.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="module" src="js/index/index.js"></script>
 </body>
 </html>

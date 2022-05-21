@@ -41,46 +41,144 @@ exports.models = [
     },
 ];
 
-exports.deviceTypes = {
+exports.typesOfDevices = {
     "Thermometer": {
         text: "Термометр",
         attributes: [
-            ["humidity", "Влажность"],
-            ["temperature", "Температура"],
+            {
+                name: "humidity",
+                russianName: "Влажность",
+                value: (item) => item,
+            },
+            {
+                name: "temperature",
+                russianName: "Температура",
+                value: (item) => item,
+            },
         ],
+        commands: [],
     },
     "Motion": {
         text: "Датчик движения",
         attributes: [
-            ["count", "Присутствие"],
+            {
+                name: "count",
+                russianName: "Присутствие",
+                value: (item) => {
+                    if (item === 0) return "Никого нет";
+                    if (item === 1) return "Кто-то есть";
+                },
+            },
         ],
+        commands: [],
     },
     "Bell": {
         text: "Звонок",
-        attributes: {
-            ring: "Позвонить",
-        },
+        attributes: [],
+        commands: [
+            {
+                name: "ring",
+                commandsDependsOnAttribute: false,
+                russianName: "Позвонить",
+            },
+        ],
     },
     "Lamp": {
         text: "Лампа",
-        attributes: {
-            status: "Состояние",
-            value: {
-                "on": "Включено",
-                "off": "Выключено",
-            }
-        },
+        attributes: [
+            {
+                name: "status",
+                russianName: "Состояние",
+                value: (item) => {
+                    if (item === "on") return "Включено";
+                    if (item === "off") return "Выключено";
+                },
+                commandsDependsOnAttribute: (item) => {
+                    if (item === "on") {
+                        return [
+                            {
+                                name: "off",
+                                russianName: "Выключить",
+                            }
+                        ]
+                    }
+                    if (item === "off") {
+                        return [
+                            {
+                                name: "on",
+                                russianName: "Включить",
+                            }
+                        ]
+                    }
+                }
+            },
+        ],
+        commands: []
     },
     "Door": {
         text: "Дверь",
-        attributes: {
-            status: "Состояние",
-            value: {
-                "open": "Открыто",
-                "close": "Закрыто",
-                "unlock": "Разблакировано",
-                "lock": "Заблокировано",
-            }
-        },
+        attributes: [
+            {
+                name: "status",
+                russianName: "Состояние",
+                value: (item) => {
+                    if (item === "open") return "Открыто";
+                    if (item === "close") return "Закрыто";
+                    if (item === "unlock") return "Разблакировано";
+                    if (item === "lock") return "Заблокировано";
+                },
+                commandsDependsOnAttribute: (item) => {
+                    if (item === "open") {
+                        return [
+                            {
+                                name: "close",
+                                russianName: "Закрыть",
+                            },
+                            {
+                                name: "lock",
+                                russianName: "Заблокировать",
+                            },
+                        ]
+                    }
+                    if (item === "close") {
+                        return [
+                            {
+                                name: "open",
+                                russianName: "Открыть",
+                            },
+                            {
+                                name: "lock",
+                                russianName: "Заблокировать",
+                            },
+                        ]
+                    }
+                    if (item === "lock") {
+                        return [
+                            {
+                                name: "unlock",
+                                russianName: "Разблокировать",
+                            },
+                        ]
+                    }
+                    if (item === "unlock") {
+                        return [
+                            {
+                                name: "open",
+                                russianName: "Открыть",
+                            },
+                            {
+                                name: "lock",
+                                russianName: "Заблокировать",
+                            },
+                            {
+                                name: "close",
+                                russianName: "Закрыть",
+                            },
+                        ]
+                    }
+                }
+            },
+        ],
+        commands: []
     },
 }

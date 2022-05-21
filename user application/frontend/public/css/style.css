@@ -86,7 +86,7 @@
 }
 
 .device__option-value {
-    padding: 8px 0px;
+    padding: 8px 4px;
     flex-grow: 6;
     /*width: 50%;*/
     overflow: hidden;
@@ -96,6 +96,11 @@
 
 .room__button-delete {
     margin-top: 6px;
+}
+
+.device__button-command{
+    width: 45%;
+    margin-top: 4px;
 }
 
 .device__button-delete {
