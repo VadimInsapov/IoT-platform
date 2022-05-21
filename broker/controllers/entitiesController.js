@@ -28,6 +28,16 @@ class EntitiesController {
 				const entitiesOfType = await EntityModel.find().lean()
 				entities = entities.concat(entitiesOfType)
 			}
+			if(req.query.hasOwnProperty("ref"))
+			{
+				entities = entities.filter(entity => {
+					for(let attr in entity){
+						if(attr!="_id" && entity[attr].type == "relationship" && entity[attr].value == req.query.ref){
+							return entity
+						} 
+					}
+				})
+			}
 			res.send(entities)
 		} catch (e) {
 			res.send(`entities ${req.method} error`);
@@ -175,6 +185,23 @@ class EntitiesController {
 			checkSubscriptions(changes)
 			res.send(entity)
 		}
+	}
+
+	async getRelationships(req, res){
+		let attributes = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${req.params.id}/attrs`).then(response => {
+			return response.json()
+		})
+		let relations = []
+		for (let attr in attributes){
+			if(attributes[attr].type == "relationship")
+			{
+				const entity = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${attributes[attr].value}`).then(response => {
+					return response.json()
+				})
+				relations.push(entity)
+			}
+		}
+		res.send(relations)
 	}
 }
 

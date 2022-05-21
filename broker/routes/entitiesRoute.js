@@ -25,6 +25,8 @@ router.post('/:id/attrs', attributeValidator.validate,
 router.patch('/:id/attrs', attributeValidator.validate,
 	entitiesController.updateExistingEntityAttributes);
 
+router.get('/:id/relationships', entitiesController.getRelationships);
+
 router.get('/:id/attrs/:name', atributesController.getAttributeData);
 router.post('/:id/attrs/:name',
 	oneAttributeValidator.validate,

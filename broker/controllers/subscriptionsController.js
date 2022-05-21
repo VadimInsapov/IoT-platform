@@ -1,16 +1,21 @@
+require('dotenv').config()
 const SubscriptionSchema = require("../mongodb/subsSchema")
 const mongoose = require('mongoose')
 const { validationResult } = require('express-validator/check');
 const sendResponseWithErrors = (response, errors) => response.status(400).json({ errors: errors.array() });
-const CreateTimeSub = require('../subs/timeSubs')
+const CreateTimeSub = require('../subs/timeSubs');
+const fetch = require('node-fetch');
 
 class SubscriptionsController {
 	async getAllSubscriptions(req, res) {
-		var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
-		let subs = await SubscriptionModel.find().lean()
-		SubscriptionModel = mongoose.model("time_subs", SubscriptionSchema)
-		const time_subs = await SubscriptionModel.find().lean()
-		subs = Object.assign(subs, time_subs)
+		// var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
+		// let subs = await SubscriptionModel.find().lean()
+		// SubscriptionModel = mongoose.model("time_subs", SubscriptionSchema)
+		// const time_subs = await SubscriptionModel.find().lean()
+		// subs = Object.assign(subs, time_subs)
+		let subs = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=time_subs,subs`).then(response => {
+			return response.json()
+		})	
 		res.send(subs)
 	} catch(e) {
 		res.send(`subscriptions ${req.method} error`);
