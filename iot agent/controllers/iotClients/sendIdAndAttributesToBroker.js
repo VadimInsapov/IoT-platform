@@ -1,8 +1,8 @@
 const axios = require('axios').default;
 module.exports = async (brokerId, newAttributes) => {
     const obj = {
-        _id: brokerId,
-        attributes: Object.keys(newAttributes),
+        id: brokerId,
+        attributes: Object.keys(newAttributes).map((item) => item.split('.')[0]),
     };
     try {
         await axios.post('http://localhost:5500/iot/agent', obj);

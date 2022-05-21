@@ -43,8 +43,10 @@ exports.addDeviceByModel = function (mqttClient) {
         const body = request.body;
         const modelAttributes = models.getAttributes(body.model);
         if ("commands" in modelAttributes && modelAttributes.transport === "HTTP") {
-            if (!("endpoint" in body))
-                response.status(400).json(`Device with HTTP transport and commands must have endpoint\nThis model has these attributes!`);
+            if (!("endpoint" in body)) {
+                response.status(400).json(`Device with HTTP transport and commands must have endpoint\nThis model has these attributes!`)
+                return;
+            }
         }
         delete body.model;
         const newBody = {
@@ -59,7 +61,7 @@ exports.addDeviceByModel = function (mqttClient) {
 exports.index = function (request, response) {
     if ("form" in request.query) {
         const {form} = request.query;
-        if (form === "short"){
+        if (form === "short") {
             response.status(200).json(IoTAgentDevice.getAllShort());
             return;
         }

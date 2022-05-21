@@ -129,6 +129,21 @@ const models = {
                 "type": "command",
                 "name": "close",
             },
+            {
+                "type": "command",
+                "name": "lock",
+            },
+            {
+                "type": "command",
+                "name": "unlock",
+            },
+        ],
+        "dynamicAttributes": [
+            {
+                "type": "text",
+                "objectId": "st",
+                "name": "status"
+            }
         ],
     },
     sdoorh: {
@@ -142,6 +157,14 @@ const models = {
             {
                 "type": "command",
                 "name": "close",
+            },
+            {
+                "type": "command",
+                "name": "lock",
+            },
+            {
+                "type": "command",
+                "name": "unlock",
             },
         ],
         "dynamicAttributes": [
