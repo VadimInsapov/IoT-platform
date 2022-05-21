@@ -5,6 +5,7 @@ hbs.registerHelper('getDeviceAttributes', function (device) {
     delete device["name"];
     delete device["_id"];
     delete device["type"];
+    delete device["refRoom"];
     // console.log(Object.entries(device));
     return Object.entries(device);
 });
@@ -27,7 +28,8 @@ exports.index = async function (request, response) {
         });
     }
     const devices = await Promise.all(shortDevicesIds.map(async (deviceId) => await iotPlatform.getObjectById(deviceId)));
-    expandDeviceInfo(devices);
+    await expandDeviceInfo(devices);
+    console.log(devices);
     const shortRooms = rooms.map(item => ({
         id: item["_id"],
         roomName: item["roomName"].value
@@ -42,13 +44,12 @@ exports.index = async function (request, response) {
 };
 
 
-function expandDeviceInfo(devices) {
-    devices.map(device => {
+async function expandDeviceInfo(devices) {
+    await Promise.all(devices.map(async device => {
         const type = device["_id"].split(":")[1];
         const deviceMustBe = entities.typesOfDevices[type];
         const attributesOfDevice = deviceMustBe.attributes;
         device.type = deviceMustBe.text;
-        console.log(deviceMustBe);
         for (const attribute of attributesOfDevice) {
             const attrName = attribute.name;
             const attrRussianName = attribute.russianName;
@@ -72,11 +73,18 @@ function expandDeviceInfo(devices) {
         }
         for (const key in device) {
             const deviceAttribute = device[key];
+            // console.log(deviceAttribute)
             if (deviceAttribute.type === "command" && !deviceAttribute.text) {
                 delete device[key];
             }
+            if (deviceAttribute.type === "relationship") {
+                const roomId = deviceAttribute.value;
+                console.log(device);
+                const room = await iotPlatform.getObjectById(roomId);
+                device[key].text = room.roomName.value;
+            }
         }
-    })
+    }));
     console.log(devices);
 }
 

@@ -51,6 +51,17 @@ exports.destroyDevice = async function (request, response) {
     }
     response.redirect(301, './')
 };
+
+exports.deleteRefRoom = async function (request, response) {
+    try {
+        const {entityName} = request.params;
+        console.log(entityName);
+        await iotPlatform.deleteAttributeByObjectId(entityName, "refRoom");
+        response.json({answer: "OK"});
+    } catch (err) {
+        console.log(err.response.data);
+    }
+};
 exports.updateDevice = async function (request, response) {
     try {
         console.log(request.body)

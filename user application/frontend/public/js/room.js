@@ -1,6 +1,10 @@
 import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
 import {makeRequest} from "./index/makeRequest.js";
+import {makeCommandHandlersForAllDevices, socketIndication} from "./indexAndRoomCommon.js";
+
+makeCommandHandlersForAllDevices();
+
 const roomId = window.location.pathname.split("/")[2];
 const buttonAddDevice = document.getElementById("addDevice");
 const popupCloseIcon = document.getElementById("close-popup");
@@ -38,6 +42,20 @@ document.addEventListener("click", async (e) => {
         console.log(url);
         await fetch(url);
         popupFunctions.closePopup(e);
+        location.reload();
     }
 });
 
+const devices = document.getElementsByClassName("device");
+for (const device of devices) {
+    const buttonDeleteDevice = device.getElementsByClassName("device__button-delete")[0];
+    buttonDeleteDevice.onclick = async () => {
+        console.log(`http://localhost:80/devices/refRoom/${device.id}`);
+        await makeRequest(`http://localhost:80/devices/refRoom/${device.id}`, "DELETE");
+        location.reload();
+    }
+}
+
+
+const socket = io();
+socket.on("indication", (message) => socketIndication(message));

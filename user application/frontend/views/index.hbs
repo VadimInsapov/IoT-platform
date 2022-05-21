@@ -59,6 +59,12 @@
                         <div class="device__option-name fs-6 bg-warning text-dark rounded">Тип</div>
                         <div class="device__option-value  border border-dark fs-6 bg-light text-dark  rounded">{{this.type}}</div>
                     </div>
+                    {{#if this.refRoom}}
+                        <div class="device__option">
+                            <div class="device__option-name fs-6 bg-warning text-dark rounded">Комната</div>
+                            <div class="device__option-value  border border-dark fs-6 bg-light text-dark  rounded">{{this.refRoom.text}}</div>
+                        </div>
+                    {{/if}}
                     {{#each (getDeviceAttributes this)}}
                         {{#if (isCommand this.[1].type)}}
                             <div class="text-center">

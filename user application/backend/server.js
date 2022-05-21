@@ -32,6 +32,7 @@ app.get("/rooms/refs/device", roomController.addRef);
 app.post("/devices", deviceController.storeDevice);
 app.post("/devices/update", deviceController.updateDevice);
 app.delete("/devices/:entityName", deviceController.destroyDevice);
+app.delete("/devices/refRoom/:entityName", deviceController.deleteRefRoom);
 app.get("/scripts", scriptsController.index);
 app.get("/scripts/create", scriptsController.create);
 app.get("/models", (req, res) => res.json(entities.models));

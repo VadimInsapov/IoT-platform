@@ -45,6 +45,13 @@ exports.getParentObjectById = (id) => {
         url: `http://localhost:5500/iot/entities?ref=${id}`,
     }).then((res) => res.data);
 }
+exports.deleteAttributeByObjectId = (id, attr) => {
+    console.log(`http://localhost:5500/iot/entities/${id}/attrs/${attr}`);
+    return axios({
+        method: "delete",
+        url: `http://localhost:5500/iot/entities/${id}/attrs/${attr}`,
+    }).then((res) => res.data);
+}
 exports.addAttributeById = (id, attribute) => {
     return axios({
         method: "post",
