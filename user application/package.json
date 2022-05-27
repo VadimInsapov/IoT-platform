@@ -10,12 +10,10 @@
     "deleteMqttThermometer": "node Devices/Thermometer/deleteMqttThermometer.js",
     "initializeHttpMotion": "node requestsDevices/Motion/initializeHttpMotion.js",
     "initializeMqttMotion": "node Devices/Motion/initializeMqttMotion.js",
-
     "initializeMqttBell": "node requestsDevices/Bell/initializeMqttBell.js",
     "initializeHttpBell": "node requestsDevices/Bell/initializeHttpBell.js",
     "updateMqttBell": "node requestsDevices/Bell/updateMqttBell.js",
     "updateHttpBell": "node requestsDevices/Bell/updateHttpBell.js",
-
     "initializeMqttLamp": "node Devices/Lamp/initializeMqttLamp.js",
     "initializeHttpLamp": "node Devices/Lamp/initializeHttpLamp.js",
     "updateMqttLamp": "node Devices/Lamp/updateMqttLamp.js",
@@ -32,6 +30,7 @@
     "axios": "^0.26.1",
     "express": "^4.17.3",
     "hbs": "^4.2.0",
+    "node-fetch": "^2.6.7",
     "nodemon": "^2.0.16",
     "socket.io": "^4.5.1"
   }

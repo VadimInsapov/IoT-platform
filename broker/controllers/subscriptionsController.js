@@ -8,14 +8,9 @@ const fetch = require('node-fetch');
 
 class SubscriptionsController {
 	async getAllSubscriptions(req, res) {
-		// var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
-		// let subs = await SubscriptionModel.find().lean()
-		// SubscriptionModel = mongoose.model("time_subs", SubscriptionSchema)
-		// const time_subs = await SubscriptionModel.find().lean()
-		// subs = Object.assign(subs, time_subs)
 		let subs = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=time_subs,subs`).then(response => {
 			return response.json()
-		})	
+		})
 		res.send(subs)
 	} catch(e) {
 		res.send(`subscriptions ${req.method} error`);
@@ -31,7 +26,11 @@ class SubscriptionsController {
 			let type = "";
 			if (req.body.hasOwnProperty("time")) type = "time_subs"
 			else type = "subs"
-			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
+			var SubscriptionModel = {}
+			if (mongoose.models.hasOwnProperty(`${type}`))
+				SubscriptionModel = mongoose.models[`${type}`]
+			else
+				SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const last_sub = await SubscriptionModel.find().sort({ _id: -1 }).limit(1).lean();
 			let empty_object = true;
 			for (let key in last_sub) {
@@ -71,10 +70,16 @@ class SubscriptionsController {
 	async getSubscription(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
-			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
+			var SubscriptionModel = {}
+			if (mongoose.models.hasOwnProperty(`${type}`))
+				SubscriptionModel = mongoose.models[`${type}`]
+			else
+				SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const sub = await SubscriptionModel.findById(req.params.id, '-__v')
+			console.log(sub)
 			return res.json(sub)
 		} catch (e) {
+			console.log(e)
 			res.send(`subscriptions id=${req.params.id} ${req.method} error`);
 		}
 	}
@@ -82,7 +87,11 @@ class SubscriptionsController {
 	async deleteSubscription(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
-			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
+			var SubscriptionModel = {}
+			if (mongoose.models.hasOwnProperty(`${type}`))
+				SubscriptionModel = mongoose.models[`${type}`]
+			else
+				SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const sub = await SubscriptionModel.findByIdAndDelete(req.params.id)
 			return res.json(sub)
 		} catch (e) {
@@ -98,7 +107,11 @@ class SubscriptionsController {
 		}
 		else {
 			const type = req.params.id.split(':')[1];
-			var SubscriptionModel = mongoose.model(type, SubscriptionSchema)
+			var SubscriptionModel = {}
+			if (mongoose.models.hasOwnProperty(`${type}`))
+				SubscriptionModel = mongoose.models[`${type}`]
+			else
+				SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			let new_sub = {
 				"_id": req.params.id
 			}

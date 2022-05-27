@@ -34,7 +34,11 @@ app.post("/devices/update", deviceController.updateDevice);
 app.delete("/devices/:entityName", deviceController.destroyDevice);
 app.delete("/devices/refRoom/:entityName", deviceController.deleteRefRoom);
 app.get("/scripts", scriptsController.index);
+app.post("/scripts", scriptsController.createScript);
 app.get("/scripts/create", scriptsController.create);
+app.get("/scripts/edit/:scriptId", scriptsController.edit);
+app.patch("/scripts/edit/:scriptId", scriptsController.updateScript);
+app.delete("/scripts/:scriptId", scriptsController.deleteScript);
 app.get("/models", (req, res) => res.json(entities.models));
 app.post("/subscription/:typeSubscription", (req, res) => {
     const {typeSubscription} = req.params;

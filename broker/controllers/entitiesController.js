@@ -17,9 +17,9 @@ class EntitiesController {
 				collection_names = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/types`).then(response => {
 					return response.json()
 				})
-				if(collection_names.indexOf("subs")!=-1)
+				if (collection_names.indexOf("subs") != -1)
 					collection_names.splice(collection_names.indexOf("subs"), 1)
-				if(collection_names.indexOf("time_subs")!=-1)
+				if (collection_names.indexOf("time_subs") != -1)
 					collection_names.splice(collection_names.indexOf("time_subs"), 1)
 			}
 			let entities = new Array()
@@ -28,13 +28,12 @@ class EntitiesController {
 				const entitiesOfType = await EntityModel.find().lean()
 				entities = entities.concat(entitiesOfType)
 			}
-			if(req.query.hasOwnProperty("ref"))
-			{
+			if (req.query.hasOwnProperty("ref")) {
 				entities = entities.filter(entity => {
-					for(let attr in entity){
-						if(attr!="_id" && entity[attr].type == "relationship" && entity[attr].value == req.query.ref){
+					for (let attr in entity) {
+						if (attr != "_id" && entity[attr].type == "relationship" && entity[attr].value == req.query.ref) {
 							return entity
-						} 
+						}
 					}
 				})
 			}
@@ -187,14 +186,13 @@ class EntitiesController {
 		}
 	}
 
-	async getRelationships(req, res){
+	async getRelationships(req, res) {
 		let attributes = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${req.params.id}/attrs`).then(response => {
 			return response.json()
 		})
 		let relations = []
-		for (let attr in attributes){
-			if(attributes[attr].type == "relationship")
-			{
+		for (let attr in attributes) {
+			if (attributes[attr].type == "relationship") {
 				const entity = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${attributes[attr].value}`).then(response => {
 					return response.json()
 				})

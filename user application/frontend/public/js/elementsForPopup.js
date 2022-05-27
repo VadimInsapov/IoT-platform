@@ -1,3 +1,5 @@
+import * as func from "../js/changeSelect.js"
+
 export function createFormTitle(title) {
     const div = document.createElement('div');
     div.className = "device__title mt-3 mb-3 text-center fs-4";
@@ -68,6 +70,28 @@ export function createSelect(defaultText, array, object = {}) {
         option.text = item.text;
         option.value = item.value;
         select.add(option);
+    }
+    switch(id){
+        case "type":{
+            select.addEventListener("change", func.changeSelectType)
+            break
+        }
+        case "attribute":{
+            select.addEventListener("change", func.changeSelectAttribute)
+            break
+        }
+        case "device":{
+            select.addEventListener("change", func.changeSelectDevice)
+            break
+        }
+        case "handlerType":{
+            select.addEventListener("change", func.changeSelectTypeHandler)
+            break
+        }
+        case "defDeviceHandler":{
+            select.addEventListener("change", func.changeSelectDeviceHandler)
+            break
+        }
     }
     return select;
 }

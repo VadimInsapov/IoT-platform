@@ -9,6 +9,7 @@ async function StartTimeSubs() {
 	for (let time_sub of entities) {
 		CreateTimeSub(time_sub)
 	}
+	return null
 }
 
 module.exports = StartTimeSubs

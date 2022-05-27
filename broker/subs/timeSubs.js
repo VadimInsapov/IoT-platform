@@ -39,27 +39,32 @@ async function CheckTimeSub(time_sub) {
 		}
 	}
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
-		let data = {}
-		// data[sub.handler.command] = {
-		// 	type: "command",
-		// 	value: ""
-		// 	// type: "number",
-		// 	// value: 0
-		// }
-		data[id]=sub.handler.id
-		data[command]=sub.handler.command
-		const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
-			method: "POST",
-			headers: {
-				'Content-Type': 'application/json;charset=utf-8'
-			},
-			body: JSON.stringify(data)
-		}).then(response => {
-			return response.json()
-		})
+		for (let handler of time_sub.handler) {
+			const idPattern = new RegExp(handler.id)
+			let probably_handlers = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${handler["id"].split(":")[1]}`).then(response => {
+				return response.json()
+			})
+			for (let hand of probably_handlers) {
+				if (idPattern.test(hand._id)) {
+					let data = {}
+					data["id"] = hand._id
+					data["command"] = handler.command
+					console.log(data)
+					const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
+						method: "POST",
+						headers: {
+							'Content-Type': 'application/json;charset=utf-8'
+						},
+						body: JSON.stringify(data)
+					}).then(response => {
+						return response.json()
+					})
+				}
+			}
+		}
 	}
 	if (time_sub.hasOwnProperty('notification') && true_condition) {
-		const notification_response = await fetch(sub.notification.url, {
+		const notification_response = await fetch(time_sub.notification.url, {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'

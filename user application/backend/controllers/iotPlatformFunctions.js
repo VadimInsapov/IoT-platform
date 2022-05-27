@@ -1,4 +1,4 @@
-const {default: axios} = require("axios");
+const { default: axios } = require("axios");
 
 exports.updateCommandInAgent = (object) => {
     return axios({
@@ -60,7 +60,6 @@ exports.addAttributeById = (id, attribute) => {
     }).then((res) => res.data);
 }
 
-
 exports.deleteObjectById = (id) => {
     return axios({
         method: "DELETE",
@@ -92,5 +91,29 @@ exports.createSubscriptionForDevice = (idPattern, typePattern, attributes, notif
         method: "post",
         url: `http://localhost:5500/iot/subscriptions`,
         data: subscription
+    }).then((res) => res.data);
+}
+
+exports.deleteScriptById = (id) => {
+    return axios({
+        method: "DELETE",
+        url: `http://localhost:5500/iot/subscriptions/${id}`,
+    }).then((res) => res.data);
+}
+
+exports.createScript = (script) => {
+    return axios({
+        method: "post",
+        url: `http://localhost:5500/iot/subscriptions`,
+        data: script
+    }).then((res) => res.data);
+}
+
+
+exports.updateScript = (id, script) => {
+    return axios({
+        method: "patch",
+        url: `http://localhost:5500/iot/subscriptions/${id}`,
+        data: script
     }).then((res) => res.data);
 }
