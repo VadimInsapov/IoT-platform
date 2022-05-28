@@ -37,12 +37,12 @@ window.onload = async function () {
     sub = await fetch(`http://127.0.0.1:5500/iot/entities/${scriptId}`).then(response => {
         return response.json()
     })
-    console.log(sub)
+    //console.log(sub)
     document.getElementById("name_input").value = sub["description"]
     if (sub.hasOwnProperty("time")) createTime(sub["time"])
     createConditions(sub.subject)
     createHandlers(sub.handler)
-    console.log(script)
+    //console.log(script)
 }
 
 function createTime(time) {
@@ -84,16 +84,18 @@ async function createConditions(subjects) {
 
 async function createHandlers(subjects) {
     for (let subject of subjects) {
+        //console.log(subject)
         let handler = {}
         if (subject["id"].split(":")[2] == ".*") {
             handler["idPattern"] = subject["id"]
             handler["nameHandler"] = types.get(subject["id"].split(":")[1])
         }
         else {
-            handler["idPattern"] = subject["idPattern"]
-            let a = await fetch(`http://127.0.0.1:5500/iot/entities/${subject["idPattern"]}/attrs/name`).then(response => {
+            handler["idPattern"] = subject["id"]
+            let a = await fetch(`http://127.0.0.1:5500/iot/entities/${subject["id"]}/attrs/name`).then(response => {
                 return response.json()
             })
+            //console.log(a)
             handler["nameHandler"] = a["value"]
         }
         handler["command"] = subject["command"]
@@ -341,6 +343,7 @@ const deleteCondition = (e) => {
 }
 
 function drawHandler(handler) {
+    console.log(handler)
     let handlersList = document.getElementById("handlersList")
     let ul_handler = document.createElement("ul")
     ul_handler.className = "list-group list-group-horizontal"
