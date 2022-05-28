@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 class SubscriptionsController {
 	async getAllSubscriptions(req, res) {
-		let subs = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=time_subs,subs`).then(response => {
+		let subs = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=time_subs,sub`).then(response => {
 			return response.json()
 		})
 		res.send(subs)

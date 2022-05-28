@@ -37,7 +37,6 @@ for (const room of rooms) {
     const buttonDeleteRoom = room.getElementsByClassName("room__button-delete")[0];
     buttonDeleteRoom.onclick = async (event) => {
         event.stopPropagation();
-        console.log(`http://localhost:80/rooms/${room.id}`);
         await makeRequest(`http://localhost:80/rooms/${room.id}`, "DELETE");
         location.reload();
     }

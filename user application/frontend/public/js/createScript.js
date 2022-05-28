@@ -1,6 +1,6 @@
 import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
-import { makeRequest } from "./index/makeRequest.js";
+import {makeRequest} from "./index/makeRequest.js";
 
 const buttonAddCondition = document.getElementById("addCondition");
 const buttonAddCommand = document.getElementById("addCommand");
@@ -13,8 +13,8 @@ const script = {
 buttonAddCondition.addEventListener("click", (e) => {
     const popupContent = popupFunctions.openPopup();
     popupContent.append(elements.createFormTitle("Условие"));
-    popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
-    popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+    popupContent.append(elements.createFormButton("Время", {classNames: ['mb-3'], id: "timeCondition"}));
+    popupContent.append(elements.createFormButton("Данные устройства", {id: "deviceCondition"}));
 });
 
 buttonAddCommand.addEventListener("click", (e) => {
@@ -24,7 +24,7 @@ buttonAddCommand.addEventListener("click", (e) => {
         classNames: ['mb-3'],
         id: "typeHandler"
     }));
-    popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "deviceHandler" }));
+    popupContent.append(elements.createFormButton("Выбрать определённое устройство", {id: "deviceHandler"}));
 });
 
 document.addEventListener("click", async (e) => {
@@ -32,8 +32,8 @@ document.addEventListener("click", async (e) => {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
         popupContent.append(elements.createFormTitle("Условие: время"));
-        popupContent.append(elements.createInput("", "", { type: "time", id: "valueTimeCondition" }));
-        popupContent.append(elements.createFormButton("Добавить", { id: "addTimeCondition" }));
+        popupContent.append(elements.createInput("", "", {type: "time", id: "valueTimeCondition"}));
+        popupContent.append(elements.createFormButton("Добавить", {id: "addTimeCondition"}));
     }
     if (e.target && e.target.id == 'deviceCondition') {
         popupFunctions.closePopup(e);
@@ -43,7 +43,7 @@ document.addEventListener("click", async (e) => {
             classNames: ['mb-3'],
             id: "typeCondition"
         }));
-        popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "defDeviceCondition" }));
+        popupContent.append(elements.createFormButton("Выбрать определённое устройство", {id: "defDeviceCondition"}));
     }
     if (e.target && e.target.id == 'typeCondition') {
         popupFunctions.closePopup(e);
@@ -51,8 +51,11 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createFormTitle("Условие"));
         popupContent.append(elements.createSelect(
             "Выбрать тип устройства",
-            [{ value: "Thermometer", text: "Термометры" }, { value: "Motion", text: "Датчики движения" }, { value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }],
-            { id: "type" }));
+            [{value: "Thermometer", text: "Термометры"}, {value: "Motion", text: "Датчики движения"}, {
+                value: "Door",
+                text: "Двери"
+            }, {value: "Lamp", text: "Лампы"}],
+            {id: "type"}));
     }
     if (e.target && e.target.id == 'defDeviceCondition') {
         popupFunctions.closePopup(e);
@@ -63,9 +66,9 @@ document.addEventListener("click", async (e) => {
         })
         let selectDevices = []
         for (let device of devices) {
-            selectDevices.push({ value: `${device._id}`, text: `${device.name.value}` })
+            selectDevices.push({value: `${device._id}`, text: `${device.name.value}`})
         }
-        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "device" }));
+        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, {id: "device"}));
     }
     if (e.target && e.target.id == 'addTimeCondition') {
         const time = document.getElementById("valueTimeCondition").value;
@@ -89,8 +92,7 @@ document.addEventListener("click", async (e) => {
             cond["idPattern"] = ".*"
             cond["typePattern"] = document.getElementById("type").value
             cond["nameSubject"] = document.getElementById("type").options[document.getElementById("type").selectedIndex].text
-        }
-        else {
+        } else {
             cond["idPattern"] = document.getElementById("device").value
             cond["typePattern"] = document.getElementById("device").value.split(':')[1]
             cond["nameSubject"] = document.getElementById("device").options[document.getElementById("device").selectedIndex].text
@@ -117,8 +119,8 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createFormTitle("Исполнитель"));
         popupContent.append(elements.createSelect(
             "Выбрать тип устройства",
-            [{ value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }, { value: "Bell", text: "Звонки" }],
-            { id: "handlerType" }));
+            [{value: "Door", text: "Двери"}, {value: "Lamp", text: "Лампы"}, {value: "Bell", text: "Звонки"}],
+            {id: "handlerType"}));
     }
     if (e.target && e.target.id == 'deviceHandler') {
         popupFunctions.closePopup(e);
@@ -129,17 +131,16 @@ document.addEventListener("click", async (e) => {
         })
         let selectDevices = []
         for (let device of devices) {
-            selectDevices.push({ value: `${device._id}`, text: `${device.name.value}` })
+            selectDevices.push({value: `${device._id}`, text: `${device.name.value}`})
         }
-        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "defDeviceHandler" }));
+        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, {id: "defDeviceHandler"}));
     }
     if (e.target && e.target.id == 'addHandler') {
         let hand = {}
         if (document.getElementById("handlerType")) {
             hand["idPattern"] = `broker:${document.getElementById("handlerType").value}:.*`
             hand["nameHandler"] = document.getElementById("handlerType").options[document.getElementById("handlerType").selectedIndex].text
-        }
-        else {
+        } else {
             hand["idPattern"] = document.getElementById("defDeviceHandler").value
             hand["nameHandler"] = document.getElementById("defDeviceHandler").options[document.getElementById("defDeviceHandler").selectedIndex].text
         }
@@ -160,15 +161,19 @@ popupCloseIcon.addEventListener("click", (e) => {
 
 buttonCreateSub.onclick = async (event) => {
     event.stopPropagation();
+
     var subscription = {}
     subscription["description"] = document.getElementById("name_input").value
+    if (!subscription["description"]) {
+        console.log("Не введено название сценария")
+        return;
+    }
     subscription["subject"] = []
     subscription["handler"] = []
     for (let cond of script.conditions) {
         if (cond["type"] == "time") {
             subscription["time"] = `${cond["hour"]}:${cond["minute"]}`
-        }
-        else {
+        } else {
             let subject = {}
             subject["idPattern"] = cond["idPattern"]
             subject["typePattern"] = cond["typePattern"]

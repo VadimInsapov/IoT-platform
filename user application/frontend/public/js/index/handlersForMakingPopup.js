@@ -38,31 +38,5 @@ export async function handleCreateRoomPopup(e) {
     popupContent.append(elements.createFormTitle("Создать комнату"));
     popupContent.append(elements.createInput("Название", "", {id: "roomName"}));
     popupContent.append(elements.createInput("Описание", "", {id: "roomDescription"}))
-    popupContent.append(elements.createSelect(
-        "Тип комнаты",
-        [
-            {value: "Ванна", text: "Ванна"},
-            {value: "Спальня", text: "Спальня"},
-            {value: "Гостиная", text: "Гостиная"},
-            {value: "Детская", text: "Детская"},
-            {value: "Кухня", text: "Кухня"},
-            {value: "Прихожая", text: "Прихожая"},
-        ],
-        {id: "roomType"}));
-    popupContent.append(elements.createInput("Ширина", "0", {
-        extraName: "м",
-        type: "number",
-        id: "roomWeight"
-    }));
-    popupContent.append(elements.createInput("Длина", "0", {
-        extraName: "м",
-        type: "number",
-        id: "roomLength"
-    }));
-    popupContent.append(elements.createInput("Высота", "0", {
-        extraName: "м",
-        type: "number",
-        id: "roomHeight"
-    }));
     popupContent.append(elements.createFormButton("Создать", {id: "createRoom"}));
 }

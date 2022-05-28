@@ -10,11 +10,28 @@ exports.index = async function (request, response) {
         devices: roomDevices,
     });
 };
+exports.getRoom = async function (request, response) {
+    try {
+        const {roomId} = request.params;
+        const room = await iotPlatform.getObjectById(roomId);
+        response.status(200).json(room);
+    } catch (err) {
+        if (err) console.log(err)
+    }
+};
 exports.storeRoom = async function (request, response) {
     try {
         console.log(request.body)
         await iotPlatform.postObjectInBroker(request.body);
         response.redirect().status(200);
+    } catch (err) {
+        if (err) console.log(err)
+    }
+};
+exports.editRoom = async function (request, response) {
+    try {
+        await iotPlatform.addAttributeById(request.params.roomId, request.body);
+        response.redirect("back");
     } catch (err) {
         if (err) console.log(err)
     }

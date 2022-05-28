@@ -25,6 +25,8 @@ app.use(express.urlencoded({ extended: false }));
 app.get("/", mainController.index);
 app.get("/devices", deviceController.index);
 app.get("/rooms/:roomId", roomController.index);
+app.get("/api/rooms/:roomId", roomController.getRoom);
+app.post("/api/rooms/:roomId/edit", roomController.editRoom);
 app.post("/rooms", roomController.storeRoom);
 app.post("/rooms", roomController.storeRoom);
 app.delete("/rooms/:roomId", roomController.destroyRoom);

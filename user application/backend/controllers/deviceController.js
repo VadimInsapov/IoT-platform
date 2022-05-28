@@ -38,7 +38,6 @@ exports.storeDevice = async function (request, response) {
 exports.destroyDevice = async function (request, response) {
     try {
         const {entityName} = request.params;
-        console.log(entityName)
         const shortDevicesIds = await iotPlatform.getAllDevicesShortFormat();
         const shortDevicesIdsReverse = {};
         Object.entries(shortDevicesIds).forEach(([key, value]) => {
@@ -46,6 +45,15 @@ exports.destroyDevice = async function (request, response) {
         });
         const macAddress = shortDevicesIdsReverse[entityName];
         await iotPlatform.deleteDeviceInAgent(macAddress);
+
+        const allSubs = await iotPlatform.getAllSubs();
+        for (const sub of allSubs) {
+            const subId = sub._id;
+            if ("description" in sub || entityName !== sub.subject[0].idPattern) {
+                continue;
+            }
+            await iotPlatform.deleteScriptById(subId);
+        }
     } catch (err) {
         console.log(err.response.data);
     }

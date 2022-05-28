@@ -101,6 +101,13 @@ exports.deleteScriptById = (id) => {
     }).then((res) => res.data);
 }
 
+exports.getAllSubs = () => {
+    return axios({
+        method: "get",
+        url: `http://127.0.0.1:5500/iot/subscriptions`,
+    }).then((res) => res.data);
+}
+
 exports.createScript = (script) => {
     return axios({
         method: "post",

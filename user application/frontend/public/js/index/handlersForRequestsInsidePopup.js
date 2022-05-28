@@ -23,10 +23,6 @@ export async function handleCreateDevice(e) {
 export async function handleCreateRoom(e) {
     const roomName = document.getElementById("roomName").value;
     const roomDescription = document.getElementById("roomDescription").value;
-    const roomType = document.getElementById("roomType").value;
-    const roomWeight = +document.getElementById("roomWeight").value;
-    const roomLength = +document.getElementById("roomLength").value;
-    const roomHeight = +document.getElementById("roomHeight").value;
     const room = {
         "type": "room",
         "attributes": [
@@ -39,22 +35,6 @@ export async function handleCreateRoom(e) {
                     "type": "text",
                     "value": roomDescription
                 },
-                "roomType": {
-                    "type": "text",
-                    "value": roomType
-                },
-                "roomWeight": {
-                    "type": "number",
-                    "value": roomWeight
-                },
-                "roomLength": {
-                    "type": "number",
-                    "value": roomLength
-                },
-                "roomHeight": {
-                    "type": "number",
-                    "value": roomHeight
-                }
             }
         ]
     }

@@ -17,47 +17,18 @@
         <div class="room-settings p-5 border border-secondary border-2 rounded-3 d-flex flex-column justify-content-center ">
             <div class="text-center fs-2 mb-3">{{room.roomName.value}}</div>
             <div class="d-flex  justify-content-center flex-column gap-3">
-                <button id="editRoom" type="button" class="btn btn-warning">Редактировать комннату</button>
-                <button id="addDevice" type="button" class="btn btn-primary">Добавить устройство</button>
+                <button id="editPopupRoom" type="button" class="btn btn-warning">Редактировать комннату</button>
                 <button id="deleteRoom" type="button" class="btn btn-danger">Удалить</button>
             </div>
         </div>
         <div class="room-info p-5  rounded-3  border border-secondary border-2 ">
+            <div class="fs-3 text-center mb-3">Описание</div>
             <ul class="list-group mb-2">
                 <li class="list-group-item fs-6">{{room.roomDescription.value}}</li>
             </ul>
-            <ul class="list-group list-group-horizontal mb-2">
-                <li class="list-group-item list-group-item-primary">
-                    <div class="fs-6">Тип комнаты</div>
-                </li>
-                <li class="list-group-item">
-                    <div class="fs-6">{{room.roomType.value}}</div>
-                </li>
-            </ul>
-            <ul class="list-group list-group-horizontal mb-2">
-                <li class="list-group-item list-group-item-primary">
-                    <div class="fs-6">Ширина</div>
-                </li>
-                <li class="list-group-item">
-                    <div class="fs-6">{{room.roomWeight.value}} м</div>
-                </li>
-            </ul>
-            <ul class="list-group list-group-horizontal mb-2">
-                <li class="list-group-item list-group-item-primary">
-                    <div class="fs-6">Длина</div>
-                </li>
-                <li class="list-group-item">
-                    <div class="fs-6">{{room.roomLength.value}} м</div>
-                </li>
-            </ul>
-            <ul class="list-group list-group-horizontal mb-2">
-                <li class="list-group-item list-group-item-primary">
-                    <div class="fs-6">Высота</div>
-                </li>
-                <li class="list-group-item">
-                    <div class="fs-6">{{room.roomHeight.value}} м</div>
-                </li>
-            </ul>
+            <div class="text-center">
+                <button id="addDevice" type="button" class="btn btn-primary">Добавить устройство</button>
+            </div>
         </div>
     </div>
     <div class="p-5 border border-secondary border-2 d-flex flex-wrap mt-4 rounded-3">

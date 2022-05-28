@@ -9,14 +9,24 @@ const roomId = window.location.pathname.split("/")[2];
 const buttonAddDevice = document.getElementById("addDevice");
 const popupCloseIcon = document.getElementById("close-popup");
 const buttonDeleteRoom = document.getElementById("deleteRoom");
+const buttonEditRoom = document.getElementById("editPopupRoom");
 buttonDeleteRoom.addEventListener("click", async (e) => {
     await makeRequest(`http://localhost:80/rooms/${roomId}`, "DELETE");
-    location.href='/';
+    location.href = '/';
+});
+buttonEditRoom.addEventListener("click", async (e) => {
+    const popupContent = popupFunctions.openPopup();
+    const responseForRoom = await fetch(`http://localhost:80/api/rooms/${roomId}`);
+    const room = await responseForRoom.json();
+    console.log(room);
+    popupContent.append(elements.createFormTitle("Редактировать комнату"));
+    popupContent.append(elements.createInput("Название", room.roomName.value, {id: "roomName"}));
+    popupContent.append(elements.createInput("Описание", room.roomDescription.value, {id: "roomDescription"}))
+    popupContent.append(elements.createFormButton("Редактировать", {id: "editRoom"}));
 });
 popupCloseIcon.addEventListener("click", (e) => {
     popupFunctions.closePopup(e)
 });
-
 buttonAddDevice.addEventListener("click", async (e) => {
     const currentPopup = document.getElementById("popup");
     currentPopup.classList.add("open");
@@ -39,9 +49,24 @@ document.addEventListener("click", async (e) => {
     if (idElement === "addDeviceInRoom") {
         const deviceId = document.getElementById("deviceInRoom").value;
         const url = `http://localhost:80/rooms/refs/device?roomId=${roomId}&&deviceId=${deviceId}`;
-        console.log(url);
         await fetch(url);
         popupFunctions.closePopup(e);
+        location.reload();
+    }
+    if (idElement === "editRoom") {
+        const roomName = document.getElementById("roomName").value;
+        const roomDescription = document.getElementById("roomDescription").value;
+        const object = {
+            "roomName": {
+                type: "text",
+                value: roomName,
+            },
+            "roomDescription": {
+                type: "text",
+                value: roomDescription,
+            }
+        };
+        await makeRequest(`/api/rooms/${roomId}/edit`, "POST", object);
         location.reload();
     }
 });
