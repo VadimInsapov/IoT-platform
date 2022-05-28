@@ -66,6 +66,7 @@ app.post("/subscription/:typeSubscription", (req, res) => {
     }
     // console.log(req.body);
     io.sockets.emit(typeSubscription,req.body);
+    res.status(200).json({answer:"OK"});
 });
 
 io.on('connection', (socket) => {
