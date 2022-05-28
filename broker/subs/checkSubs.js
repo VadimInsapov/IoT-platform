@@ -5,8 +5,12 @@ const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
 
 async function CheckSubscriptionsWithChanges(changes) {
-	var SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
-	let subscriptions = await SubscriptionModel.find().lean()
+	var SubscriptionModel = {}
+	if (mongoose.models.hasOwnProperty(`subs`))
+		SubscriptionModel = mongoose.models[`subs`]
+	else
+		SubscriptionModel = mongoose.model("subs", SubscriptionSchema)
+let subscriptions = await SubscriptionModel.find().lean()
 	subscriptions = Array.from(subscriptions)
 	let right_subs = new Array()
 	const symbols = /(<=|>=|!=|>|<|=)/
@@ -40,20 +44,23 @@ async function CheckSubscriptionsWithChanges(changes) {
 			}
 		}
 	}
-	console.log(right_subs)
+	//console.log(right_subs)
 	for (let sub of right_subs) {
+		//console.log(sub)
 		if (sub.hasOwnProperty("handler")) {
 			for (let handler of sub.handler) {
+				
 				const idPattern = new RegExp(handler.id)
 				let probably_handlers = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${handler["id"].split(":")[1]}`).then(response => {
 					return response.json()
 				})
 				for (let hand of probably_handlers) {
+					//console.log(hand)
 					if (idPattern.test(hand._id)) {
 						let data = {}
 						data["id"] = hand._id
 						data["command"] = handler.command
-						console.log(data)
+						//console.log(data)
 						const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
 							method: "POST",
 							headers: {
@@ -64,7 +71,6 @@ async function CheckSubscriptionsWithChanges(changes) {
 							return response.json()
 						})
 					}
-
 				}
 			}
 		}

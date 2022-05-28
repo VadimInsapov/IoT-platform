@@ -92,10 +92,15 @@ class EntitiesController {
 	async getEntity(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
-			var EntityModel = mongoose.model(type, EntitySchema)
+			var EntityModel = {}
+			if (mongoose.models.hasOwnProperty(`${type}`))
+				EntityModel = mongoose.models[`${type}`]
+			else
+				EntityModel = mongoose.model(type, EntitySchema)
 			const entity = await EntityModel.findById(req.params.id, '-__v')
 			return res.json(entity)
 		} catch (e) {
+			console.log(e)
 			res.send(`entities id=${req.params.id} ${req.method} error`);
 		}
 	}
