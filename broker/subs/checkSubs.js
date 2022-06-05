@@ -47,9 +47,9 @@ let subscriptions = await SubscriptionModel.find().lean()
 	//console.log(right_subs)
 	for (let sub of right_subs) {
 		//console.log(sub)
+		let handler_sended = true
 		if (sub.hasOwnProperty("handler")) {
 			for (let handler of sub.handler) {
-				
 				const idPattern = new RegExp(handler.id)
 				let probably_handlers = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${handler["id"].split(":")[1]}`).then(response => {
 					return response.json()
@@ -57,30 +57,46 @@ let subscriptions = await SubscriptionModel.find().lean()
 				for (let hand of probably_handlers) {
 					//console.log(hand)
 					if (idPattern.test(hand._id)) {
-						let data = {}
-						data["id"] = hand._id
-						data["command"] = handler.command
-						//console.log(data)
-						const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
-							method: "POST",
-							headers: {
-								'Content-Type': 'application/json;charset=utf-8'
-							},
-							body: JSON.stringify(data)
-						}).then(response => {
+						let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
 							return response.json()
 						})
+						//console.log(handler_status)
+						if(handler_status.value != handler.command)
+						{
+							handler_sended = true
+							let data = {}
+							data["id"] = hand._id
+							data["command"] = handler.command
+							//console.log(data)
+							const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
+								method: "POST",
+								headers: {
+									'Content-Type': 'application/json;charset=utf-8'
+								},
+								body: JSON.stringify(data)
+							}).then(response => {
+								return response.json()
+							})
+							//console.log(handler_response)
+						}
+						else handler_sended = false
+						//console.log(handler_sended)
 					}
 				}
 			}
 		}
-		if (sub.hasOwnProperty("notification")) {
+		if (sub.hasOwnProperty("notification") && handler_sended) {
+			let data = {}
+			data["idSub"] = sub._id
+			if(sub.hasOwnProperty("description")) data["nameSub"] = sub.description
+			Object.assign(data, changes)
+			//console.log(data)
 			const notification_response = await fetch(sub.notification.url, {
 				method: "POST",
 				headers: {
 					'Content-Type': 'application/json;charset=utf-8'
 				},
-				body: JSON.stringify(changes)
+				body: JSON.stringify(data)
 			}).then(response => {
 				return response.json()
 			})

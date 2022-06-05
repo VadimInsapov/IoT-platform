@@ -280,6 +280,7 @@ buttonUpdateSub.onclick = async (event) => {
         handler["command"] = hand["command"]
         subscription["handler"].push(handler)
     }
+    subscription["notification"] = {"url": "http://localhost:80/"}
     await makeRequest(`http://localhost:80/scripts/edit/${scriptId}`, "PATCH", subscription);
     window.location.href = '/scripts'
 }

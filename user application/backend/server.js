@@ -23,6 +23,9 @@ app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", mainController.index);
+app.post("/", (req, res)=>{
+    console.log(req.body)
+})
 app.get("/devices", deviceController.index);
 app.get("/rooms/:roomId", roomController.index);
 app.get("/api/rooms/:roomId", roomController.getRoom);

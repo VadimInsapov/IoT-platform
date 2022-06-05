@@ -189,6 +189,7 @@ buttonCreateSub.onclick = async (event) => {
         handler["command"] = hand["command"]
         subscription["handler"].push(handler)
     }
+    subscription["notification"] = {"url": "http://localhost:80/"}
     await makeRequest(`http://localhost:80/scripts`, "POST", subscription);
     window.location.href = '/scripts'
 }

@@ -38,6 +38,7 @@ async function CheckTimeSub(time_sub) {
 			}
 		}
 	}
+	let handler_sended = true
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
 		for (let handler of time_sub.handler) {
 			const idPattern = new RegExp(handler.id)
@@ -46,34 +47,50 @@ async function CheckTimeSub(time_sub) {
 			})
 			for (let hand of probably_handlers) {
 				if (idPattern.test(hand._id)) {
-					let data = {}
-					data["id"] = hand._id
-					data["command"] = handler.command
-					console.log(data)
-					const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
-						method: "POST",
-						headers: {
-							'Content-Type': 'application/json;charset=utf-8'
-						},
-						body: JSON.stringify(data)
-					}).then(response => {
+					let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
 						return response.json()
 					})
-				}
+					//console.log(handler_status)
+					if(handler_status.value != handler.command)
+					{
+						handler_sended = true
+						let data = {}
+						data["id"] = hand._id
+						data["command"] = handler.command
+						//console.log(data)
+						const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
+							method: "POST",
+							headers: {
+								'Content-Type': 'application/json;charset=utf-8'
+							},
+							body: JSON.stringify(data)
+						}).then(response => {
+							return response.json()
+						})
+						//console.log(handler_response)
+					}
+					else handler_sended = false
+					//console.log(handler_sended)
+			}
 			}
 		}
 	}
-	if (time_sub.hasOwnProperty('notification') && true_condition) {
+	if (time_sub.hasOwnProperty('notification') && true_condition && handler_sended) {
+		let data = {}
+		data["idSub"] = time_sub._id
+		if(time_sub.hasOwnProperty("description")) data["nameSub"] = time_sub.description
+		Object.assign(data, changes)
+		//console.log(data)
 		const notification_response = await fetch(time_sub.notification.url, {
 			method: "POST",
 			headers: {
 				'Content-Type': 'application/json;charset=utf-8'
 			},
-			body: JSON.stringify(changes)
+			body: JSON.stringify(data)
 		}).then(response => {
 			return response.json()
 		})
-	}
+}
 }
 
 module.exports = CreateTimeSub
