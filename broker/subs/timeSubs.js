@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
 
 function CreateTimeSub(time_sub) {
-	const job = new CronJob(`0 ${time_sub.time.split(':')[1]} ${time_sub.time.split(':')[0]} * * *`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
+	const job = new CronJob(`0 ${time_sub.time["minute"]} ${time_sub.time["hour"]} * * ${time_sub.time["days"]}`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
 	job.start();
 }
 

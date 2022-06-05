@@ -32,6 +32,7 @@ document.addEventListener("click", async (e) => {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
         popupContent.append(elements.createFormTitle("Условие: время"));
+        popupContent.append(elements.createDaysCheckboxs())
         popupContent.append(elements.createInput("", "", {type: "time", id: "valueTimeCondition"}));
         popupContent.append(elements.createFormButton("Добавить", {id: "addTimeCondition"}));
     }
@@ -51,10 +52,7 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createFormTitle("Условие"));
         popupContent.append(elements.createSelect(
             "Выбрать тип устройства",
-            [{value: "Thermometer", text: "Термометры"}, {value: "Motion", text: "Датчики движения"}, {
-                value: "Door",
-                text: "Двери"
-            }, {value: "Lamp", text: "Лампы"}],
+            [{value: "Thermometer", text: "Термометры"}, {value: "Motion", text: "Датчики движения"}, {value: "Door", text: "Двери"}, {value: "Lamp", text: "Лампы"}],
             {id: "type"}));
     }
     if (e.target && e.target.id == 'defDeviceCondition') {
@@ -71,15 +69,28 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, {id: "device"}));
     }
     if (e.target && e.target.id == 'addTimeCondition') {
+        const days = document.getElementsByClassName("daysOfWeek")
+        let name_days = ""
+        let value_days = ""
+        for(let day of days) {
+            if(day.checked) {
+                name_days += day.name +','
+                value_days += day.value + ','
+            }
+        }
+        name_days = name_days.slice(0, -1)
+        value_days = value_days.slice(0, -1)
         const time = document.getElementById("valueTimeCondition").value;
         if (!time) return;
         const [hour, minute] = time.split(":");
         let cond = {
             type: "time",
             hour: hour,
-            minute: minute
+            minute: minute,
+            name_days: name_days,
+            value_days: value_days
         }
-        cond["id"] = `condition ${cond["hour"]} ${cond["minute"]}`
+        cond["id"] = `condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
         script.conditions.push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
@@ -172,7 +183,11 @@ buttonCreateSub.onclick = async (event) => {
     subscription["handler"] = []
     for (let cond of script.conditions) {
         if (cond["type"] == "time") {
-            subscription["time"] = `${cond["hour"]}:${cond["minute"]}`
+            let time = {}
+            time["hour"] = cond["hour"]
+            time["minute"] = cond["minute"]
+            time["days"] = cond["value_days"]
+            subscription["time"] = time
         } else {
             let subject = {}
             subject["idPattern"] = cond["idPattern"]
@@ -189,7 +204,8 @@ buttonCreateSub.onclick = async (event) => {
         handler["command"] = hand["command"]
         subscription["handler"].push(handler)
     }
-    subscription["notification"] = {"url": "http://localhost:80/"}
+    subscription["notification"] = {"url": "http://localhost:80/subscription/scripts"}
+    console.log(subscription)
     await makeRequest(`http://localhost:80/scripts`, "POST", subscription);
     window.location.href = '/scripts'
 }
@@ -200,7 +216,7 @@ function drawTimeCondition(time) {
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_1 = document.createElement("li")
     li_condition_1.className = "list-group-item fs-4"
-    li_condition_1.textContent = `Время:`
+    li_condition_1.textContent = `${time["name_days"]}:`
     let li_condition_2 = document.createElement("li")
     li_condition_2.className = "list-group-item fs-4"
     li_condition_2.textContent = `${time["hour"]}:${time["minute"]}`

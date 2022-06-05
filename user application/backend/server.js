@@ -23,7 +23,7 @@ app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", mainController.index);
-app.post("/", (req, res)=>{
+app.post("/subscription/scripts", (req, res)=>{
     console.log(req.body)
 })
 app.get("/devices", deviceController.index);
