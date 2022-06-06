@@ -11,16 +11,17 @@ function CreateTimeSub(time_sub) {
 async function CheckTimeSub(time_sub) {
 	let true_condition = true
 	if (time_sub.hasOwnProperty('subject')) {
+		const fullCondition_value = true
+		let bools_subs = new Array()
+		const logical = /(&&|\|\||\(|\))/
 		const symbols = /(<=|>=|!=|>|<|=)/
 		for (let subject of time_sub.subject) {
 			const typePattern = new RegExp(subject.typePattern)
 			const idPattern = new RegExp(subject.idPattern)
-			let conditions = new Array
-			conditions = subject.condition.split(";")
+			let check_subject = true
 			let existing_types = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/types`).then(response => {
 				return response.json()
 			})
-			existing_types = Object.values(existing_types)
 			for (let type of existing_types) {
 				if (typePattern.test(type)) {
 					let entities = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${type}`).then(response => {
@@ -28,15 +29,29 @@ async function CheckTimeSub(time_sub) {
 					})
 					for (let entity of entities) {
 						if (idPattern.test(entity._id)) {
-							for (let cond of conditions) {
-								const condition = cond.split(symbols)
-								true_condition = true_condition && await checkCondition(condition, entity).then(b => { return b })
+							if (subject.hasOwnProperty("condition")) {
+								const condition = subject["condition"].split(symbols)
+								const attribute = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${entity._id}/attrs/${condition[0]}`).then(response => {
+									return response.json()
+								})
+								let checked_object = {}
+								checked_object["_id"] = entity._id
+								checked_object[condition[0]] = attribute
+								check_subject = check_subject && await checkCondition(condition, checked_object).then(b => { return b })
 							}
 						}
 					}
 				}
 			}
+			bools_subs.push(check_subject)
 		}
+		const fullCondition = time_sub.fullCondition.split(logical)
+		for (let part of fullCondition) {
+			if (!logical.test(part)) {
+				fullCondition[fullCondition.indexOf(part)] = bools_subs[part]
+			}
+		}
+		true_condition = eval(fullCondition.join(''))
 	}
 	let handler_sended = true
 	if (time_sub.hasOwnProperty('handler') && true_condition) {

@@ -1,20 +1,25 @@
 import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
-import {makeRequest} from "./index/makeRequest.js";
+import { makeRequest } from "./index/makeRequest.js";
 
 const buttonAddCondition = document.getElementById("addCondition");
 const buttonAddCommand = document.getElementById("addCommand");
 const buttonCreateSub = document.getElementById("createSub")
+const buttonAddConditionBlock = document.getElementById("addConditionBlock")
 
+let block_num = 2
+let current_block = 1
 const script = {
-    conditions: [],
+    conditions: [[]],
     handlers: [],
 }
 buttonAddCondition.addEventListener("click", (e) => {
     const popupContent = popupFunctions.openPopup();
     popupContent.append(elements.createFormTitle("Условие"));
-    popupContent.append(elements.createFormButton("Время", {classNames: ['mb-3'], id: "timeCondition"}));
-    popupContent.append(elements.createFormButton("Данные устройства", {id: "deviceCondition"}));
+    popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
+    popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+    current_block = 1
+    console.log(current_block)
 });
 
 buttonAddCommand.addEventListener("click", (e) => {
@@ -24,7 +29,7 @@ buttonAddCommand.addEventListener("click", (e) => {
         classNames: ['mb-3'],
         id: "typeHandler"
     }));
-    popupContent.append(elements.createFormButton("Выбрать определённое устройство", {id: "deviceHandler"}));
+    popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "deviceHandler" }));
 });
 
 document.addEventListener("click", async (e) => {
@@ -33,8 +38,8 @@ document.addEventListener("click", async (e) => {
         const popupContent = popupFunctions.openPopup();
         popupContent.append(elements.createFormTitle("Условие: время"));
         popupContent.append(elements.createDaysCheckboxs())
-        popupContent.append(elements.createInput("", "", {type: "time", id: "valueTimeCondition"}));
-        popupContent.append(elements.createFormButton("Добавить", {id: "addTimeCondition"}));
+        popupContent.append(elements.createInput("", "", { type: "time", id: "valueTimeCondition" }));
+        popupContent.append(elements.createFormButton("Добавить", { id: "addTimeCondition" }));
     }
     if (e.target && e.target.id == 'deviceCondition') {
         popupFunctions.closePopup(e);
@@ -44,7 +49,7 @@ document.addEventListener("click", async (e) => {
             classNames: ['mb-3'],
             id: "typeCondition"
         }));
-        popupContent.append(elements.createFormButton("Выбрать определённое устройство", {id: "defDeviceCondition"}));
+        popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "defDeviceCondition" }));
     }
     if (e.target && e.target.id == 'typeCondition') {
         popupFunctions.closePopup(e);
@@ -52,8 +57,8 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createFormTitle("Условие"));
         popupContent.append(elements.createSelect(
             "Выбрать тип устройства",
-            [{value: "Thermometer", text: "Термометры"}, {value: "Motion", text: "Датчики движения"}, {value: "Door", text: "Двери"}, {value: "Lamp", text: "Лампы"}],
-            {id: "type"}));
+            [{ value: "Thermometer", text: "Термометры" }, { value: "Motion", text: "Датчики движения" }, { value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }],
+            { id: "type" }));
     }
     if (e.target && e.target.id == 'defDeviceCondition') {
         popupFunctions.closePopup(e);
@@ -64,17 +69,17 @@ document.addEventListener("click", async (e) => {
         })
         let selectDevices = []
         for (let device of devices) {
-            selectDevices.push({value: `${device._id}`, text: `${device.name.value}`})
+            selectDevices.push({ value: `${device._id}`, text: `${device.name.value}` })
         }
-        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, {id: "device"}));
+        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "device" }));
     }
     if (e.target && e.target.id == 'addTimeCondition') {
         const days = document.getElementsByClassName("daysOfWeek")
         let name_days = ""
         let value_days = ""
-        for(let day of days) {
-            if(day.checked) {
-                name_days += day.name +','
+        for (let day of days) {
+            if (day.checked) {
+                name_days += day.name + ','
                 value_days += day.value + ','
             }
         }
@@ -90,8 +95,8 @@ document.addEventListener("click", async (e) => {
             name_days: name_days,
             value_days: value_days
         }
-        cond["id"] = `condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
-        script.conditions.push(cond)
+        cond["id"] = `${current_block} condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
+        script.conditions[current_block - 1].push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
         drawTimeCondition(cond)
@@ -118,8 +123,8 @@ document.addEventListener("click", async (e) => {
             cond_string += document.getElementById("conditionValue").value;
             cond["condition"] = cond_string
         }
-        cond["id"] = `condition ${cond["nameSubject"]} ${cond["nameAttrs"]} ${cond.hasOwnProperty("condition") ? cond["condition"] : ""}`
-        script.conditions.push(cond)
+        cond["id"] = `${current_block} condition ${cond["nameSubject"]} ${cond["nameAttrs"]} ${cond.hasOwnProperty("condition") ? cond["condition"] : ""}`
+        script.conditions[current_block - 1].push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
         drawCondition(cond)
@@ -130,8 +135,8 @@ document.addEventListener("click", async (e) => {
         popupContent.append(elements.createFormTitle("Исполнитель"));
         popupContent.append(elements.createSelect(
             "Выбрать тип устройства",
-            [{value: "Door", text: "Двери"}, {value: "Lamp", text: "Лампы"}, {value: "Bell", text: "Звонки"}],
-            {id: "handlerType"}));
+            [{ value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }, { value: "Bell", text: "Звонки" }],
+            { id: "handlerType" }));
     }
     if (e.target && e.target.id == 'deviceHandler') {
         popupFunctions.closePopup(e);
@@ -142,9 +147,9 @@ document.addEventListener("click", async (e) => {
         })
         let selectDevices = []
         for (let device of devices) {
-            selectDevices.push({value: `${device._id}`, text: `${device.name.value}`})
+            selectDevices.push({ value: `${device._id}`, text: `${device.name.value}` })
         }
-        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, {id: "defDeviceHandler"}));
+        popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "defDeviceHandler" }));
     }
     if (e.target && e.target.id == 'addHandler') {
         let hand = {}
@@ -172,7 +177,7 @@ popupCloseIcon.addEventListener("click", (e) => {
 
 buttonCreateSub.onclick = async (event) => {
     event.stopPropagation();
-
+    let counter = 0
     var subscription = {}
     subscription["description"] = document.getElementById("name_input").value
     if (!subscription["description"]) {
@@ -181,37 +186,60 @@ buttonCreateSub.onclick = async (event) => {
     }
     subscription["subject"] = []
     subscription["handler"] = []
-    for (let cond of script.conditions) {
-        if (cond["type"] == "time") {
-            let time = {}
-            time["hour"] = cond["hour"]
-            time["minute"] = cond["minute"]
-            time["days"] = cond["value_days"]
-            subscription["time"] = time
-        } else {
-            let subject = {}
-            subject["idPattern"] = cond["idPattern"]
-            subject["typePattern"] = cond["typePattern"]
-            subject["attrs"] = cond["attrs"]
-            if (cond.hasOwnProperty("condition"))
-                subject["condition"] = cond["attrs"][0] + cond["condition"]
-            subscription["subject"].push(subject)
+    let full_cond = ""
+    for (let cond_array of script.conditions) {
+        if (cond_array.length != 0) {
+            for (let cond of cond_array) {
+                if (cond["type"] == "time") {
+                    let time = {}
+                    time["hour"] = cond["hour"]
+                    time["minute"] = cond["minute"]
+                    time["days"] = cond["value_days"]
+                    subscription["time"] = time
+                } else {
+                    let subject = {}
+                    subject["idPattern"] = cond["idPattern"]
+                    subject["typePattern"] = cond["typePattern"]
+                    subject["attrs"] = cond["attrs"]
+                    if (cond.hasOwnProperty("condition"))
+                        subject["condition"] = cond["attrs"][0] + cond["condition"]
+                    subscription["subject"].push(subject)
+                    full_cond += counter + "&&"
+                    counter++
+                }
+            }
+            full_cond = full_cond.slice(0, -2)
+            full_cond += "||"
         }
     }
+    full_cond = full_cond.slice(0, -2)
     for (let hand of script.handlers) {
         let handler = {}
         handler["id"] = hand["idPattern"]
         handler["command"] = hand["command"]
         subscription["handler"].push(handler)
     }
-    subscription["notification"] = {"url": "http://localhost:80/subscription/scripts"}
+    subscription["fullCondition"] = full_cond
+    subscription["notification"] = { "url": "http://localhost:80/subscription/scripts" }
     console.log(subscription)
     await makeRequest(`http://localhost:80/scripts`, "POST", subscription);
     window.location.href = '/scripts'
 }
 
+buttonAddConditionBlock.onclick = (event) => {
+    drawConditionBlock()
+    script.conditions.push(new Array())
+}
+
 function drawTimeCondition(time) {
-    let conditionList = document.getElementById("conditionsList")
+    let block = document.getElementById(`${current_block}`)
+    let conditionList = {}
+    for (let div of block.childNodes) {
+        if (div.id == "conditionsList") {
+            conditionList = div
+            break
+        }
+    }
     let ul_condition = document.createElement("ul")
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_1 = document.createElement("li")
@@ -231,7 +259,14 @@ function drawTimeCondition(time) {
 }
 
 function drawCondition(condition) {
-    let conditionList = document.getElementById("conditionsList")
+    let block = document.getElementById(`${current_block}`)
+    let conditionList = {}
+    for (let div of block.childNodes) {
+        if (div.id == "conditionsList") {
+            conditionList = div
+            break
+        }
+    }
     let ul_condition = document.createElement("ul")
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_subject = document.createElement("li")
@@ -258,12 +293,14 @@ function drawCondition(condition) {
 
 const deleteCondition = (e) => {
     const button = e.target
-    for (let cond of script.conditions) {
-        if (Object.values(cond).includes(button.id)) {
-            script.conditions.splice(script.conditions.indexOf(cond), 1)
-            document.getElementById(button.id).parentElement.remove()
-            console.log(script)
-            return
+    for (let cond_array of script.conditions) {
+        for (let cond of cond_array) {
+            if (Object.values(cond).includes(button.id)) {
+                cond_array.splice(cond_array.indexOf(cond), 1)
+                document.getElementById(button.id).parentElement.remove()
+                console.log(script)
+                return
+            }
         }
     }
 }
@@ -298,4 +335,40 @@ const deleteHandler = (e) => {
             return
         }
     }
+}
+
+function drawConditionBlock() {
+    let block = document.createElement('div')
+    block.id = `${block_num}`
+    let name_div = document.createElement('div')
+    name_div.className = "p-2 d-inline-block border border-2 border-warning rounded-3 w-75  mb-3"
+    let name = document.createElement('div')
+    name.className = "fs-4 text-center"
+    name.textContent = `Набор условий ${block_num}`
+    name_div.appendChild(name)
+    block.appendChild(name_div)
+    let button_div = document.createElement('div')
+    button_div.className = "mb-3"
+    let button = document.createElement('button')
+    button.id = "addCondition"
+    button.type = "button"
+    button.className = "btn btn-warning btn-lg me-2"
+    button.textContent = "Добавить условие"
+    button.addEventListener("click", (e) => {
+        const popupContent = popupFunctions.openPopup();
+        popupContent.append(elements.createFormTitle("Условие"));
+        popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
+        popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+        current_block = Number(block.id)
+        console.log(current_block)
+    });
+    button_div.appendChild(button)
+    block.appendChild(button_div)
+    let conditions = document.createElement('div')
+    conditions.className = "mb-3"
+    conditions.id = "conditionsList"
+    block.appendChild(conditions)
+    let conditionBlock = document.getElementById("ConditionBlocks")
+    conditionBlock.appendChild(block)
+    block_num++
 }

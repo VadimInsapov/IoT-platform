@@ -7,6 +7,7 @@ let sub = {}
 const buttonAddCondition = document.getElementById("addCondition");
 const buttonAddCommand = document.getElementById("addCommand");
 const buttonUpdateSub = document.getElementById("updateSub")
+const buttonAddConditionBlock = document.getElementById("addConditionBlock")
 
 const types = new Map([
     ['Thermometer', 'Термометры'],
@@ -38,8 +39,10 @@ const week_days = new Map([
     ["0", "вс"],
 ])
 
+let block_num = 2
+let current_block = 1
 const script = {
-    conditions: [],
+    conditions: [[]],
     handlers: [],
 }
 window.onload = async function () {
@@ -49,9 +52,9 @@ window.onload = async function () {
     //console.log(sub)
     document.getElementById("name_input").value = sub["description"]
     if (sub.hasOwnProperty("time")) createTime(sub["time"])
-    createConditions(sub.subject)
+    createConditions(sub.subject, sub.fullCondition)
     createHandlers(sub.handler)
-    //console.log(script)
+    console.log(script)
 }
 
 function createTime(time) {
@@ -62,8 +65,8 @@ function createTime(time) {
     condition["value_days"] = time["days"]
     const days = condition["value_days"].split(",")
     condition["name_days"] = ""
-    for(let day of days){
-        condition["name_days"] += week_days.get(day)+','
+    for (let day of days) {
+        condition["name_days"] += week_days.get(day) + ','
     }
     condition["name_days"] = condition["name_days"].slice(0, -1)
     condition["id"] = `condition ${condition["hour"]} ${condition["minute"]} ${condition["value_days"]}`
@@ -71,30 +74,44 @@ function createTime(time) {
     drawTimeCondition(condition)
 }
 
-async function createConditions(subjects) {
-    for (let subject of subjects) {
-        let condition = {}
-        condition["type"] = "subject"
-        if (subject["idPattern"] == ".*") {
-            condition["idPattern"] = subject["idPattern"]
-            condition["typePattern"] = subject["typePattern"]
-            condition["nameSubject"] = types.get(subject["typePattern"])
+async function createConditions(subjects, full_cond) {
+    const logical = /(&&|\|\||\(|\))/
+    const fullCondition = full_cond.split(logical)
+    let counter = 0
+    for (let part of fullCondition) {
+        if(part == "&&") continue
+        else if (part == "||") {
+            script.conditions.push(new Array())
+            current_block++
+            drawConditionBlock()
+            counter++
         }
         else {
-            condition["idPattern"] = subject["idPattern"]
-            condition["typePattern"] = subject["typePattern"]
-            let a = await fetch(`http://127.0.0.1:5500/iot/entities/${subject["idPattern"]}/attrs/name`).then(response => {
-                return response.json()
-            })
-            condition["nameSubject"] = a["value"]
+    //for (let subject of subjects) {
+            let condition = {}
+            condition["type"] = "subject"
+            if (subjects[Number(part)]["idPattern"] == ".*") {
+                condition["idPattern"] = subjects[Number(part)]["idPattern"]
+                condition["typePattern"] = subjects[Number(part)]["typePattern"]
+                condition["nameSubject"] = types.get(subjects[Number(part)]["typePattern"])
+            }
+            else {
+                condition["idPattern"] = subjects[Number(part)]["idPattern"]
+                condition["typePattern"] = subjects[Number(part)]["typePattern"]
+                let a = await fetch(`http://127.0.0.1:5500/iot/entities/${subjects[Number(part)]["idPattern"]}/attrs/name`).then(response => {
+                    return response.json()
+                })
+                condition["nameSubject"] = a["value"]
+            }
+            condition["attrs"] = subjects[Number(part)]["attrs"]
+            condition["nameAttrs"] = attributes.get(subjects[Number(part)]["attrs"][0])
+            if (subjects[Number(part)].hasOwnProperty("condition"))
+                condition["condition"] = subjects[Number(part)]["condition"].replace(subjects[Number(part)]["attrs"][0], "")
+            condition["id"] = `${current_block} condition ${condition["nameSubject"]} ${condition["nameAttrs"]} ${condition.hasOwnProperty("condition") ? condition["condition"] : ""}`
+            script.conditions[counter].push(condition)
+            drawCondition(condition)
+
         }
-        condition["attrs"] = subject["attrs"]
-        condition["nameAttrs"] = attributes.get(subject["attrs"][0])
-        if (subject.hasOwnProperty("condition"))
-            condition["condition"] = subject["condition"].replace(subject["attrs"][0], "")
-        condition["id"] = `condition ${condition["nameSubject"]} ${condition["nameAttrs"]} ${condition.hasOwnProperty("condition") ? condition["condition"] : ""}`
-        script.conditions.push(condition)
-        drawCondition(condition)
     }
 }
 
@@ -127,6 +144,7 @@ buttonAddCondition.addEventListener("click", (e) => {
     popupContent.append(elements.createFormTitle("Условие"));
     popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
     popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+    current_block = 1
 });
 
 buttonAddCommand.addEventListener("click", (e) => {
@@ -184,9 +202,9 @@ document.addEventListener("click", async (e) => {
         const days = document.getElementsByClassName("daysOfWeek")
         let name_days = ""
         let value_days = ""
-        for(let day of days) {
-            if(day.checked) {
-                name_days += day.name +','
+        for (let day of days) {
+            if (day.checked) {
+                name_days += day.name + ','
                 value_days += day.value + ','
             }
         }
@@ -202,8 +220,8 @@ document.addEventListener("click", async (e) => {
             name_days: name_days,
             value_days: value_days
         }
-        cond["id"] = `condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
-        script.conditions.push(cond)
+        cond["id"] = `${current_block} condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
+        script.conditions[current_block - 1].push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
         drawTimeCondition(cond)
@@ -231,8 +249,8 @@ document.addEventListener("click", async (e) => {
             cond_string += document.getElementById("conditionValue").value;
             cond["condition"] = cond_string
         }
-        cond["id"] = `condition ${cond["nameSubject"]} ${cond["nameAttrs"]} ${cond.hasOwnProperty["condition"] ? cond["condition"] : ""}`
-        script.conditions.push(cond)
+        cond["id"] = `${current_block} condition ${cond["nameSubject"]} ${cond["nameAttrs"]} ${cond.hasOwnProperty("condition") ? cond["condition"] : ""}`
+        script.conditions[current_block - 1].push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
         drawCondition(cond)
@@ -286,41 +304,65 @@ popupCloseIcon.addEventListener("click", (e) => {
 
 buttonUpdateSub.onclick = async (event) => {
     event.stopPropagation();
+    let counter = 0
     var subscription = {}
     subscription["description"] = document.getElementById("name_input").value
     subscription["subject"] = []
     subscription["handler"] = []
-    for (let cond of script.conditions) {
-        if (cond["type"] == "time") {
-            let time = {}
-            time["hour"] = cond["hour"]
-            time["minute"] = cond["minute"]
-            time["days"] = cond["value_days"]
-            subscription["time"] = time
-        }
-        else {
-            let subject = {}
-            subject["idPattern"] = cond["idPattern"]
-            subject["typePattern"] = cond["typePattern"]
-            subject["attrs"] = cond["attrs"]
-            if (cond.hasOwnProperty("condition"))
-                subject["condition"] = cond["attrs"][0] + cond["condition"]
-            subscription["subject"].push(subject)
+    let full_cond = ""
+    for (let cond_array of script.conditions) {
+        if (cond_array.length != 0) {
+            for (let cond of cond_array) {
+                if (cond["type"] == "time") {
+                    let time = {}
+                    time["hour"] = cond["hour"]
+                    time["minute"] = cond["minute"]
+                    time["days"] = cond["value_days"]
+                    subscription["time"] = time
+                }
+                else {
+                    let subject = {}
+                    subject["idPattern"] = cond["idPattern"]
+                    subject["typePattern"] = cond["typePattern"]
+                    subject["attrs"] = cond["attrs"]
+                    if (cond.hasOwnProperty("condition"))
+                        subject["condition"] = cond["attrs"][0] + cond["condition"]
+                    subscription["subject"].push(subject)
+                    full_cond += counter + "&&"
+                    counter++
+                }
+            }
+            full_cond = full_cond.slice(0, -2)
+            full_cond += "||"
         }
     }
+    full_cond = full_cond.slice(0, -2)
     for (let hand of script.handlers) {
         let handler = {}
         handler["id"] = hand["idPattern"]
         handler["command"] = hand["command"]
         subscription["handler"].push(handler)
     }
-    subscription["notification"] = {"url": "http://localhost:80/subscription/scripts"}
+    subscription["fullCondition"] = full_cond
+    subscription["notification"] = { "url": "http://localhost:80/subscription/scripts" }
     await makeRequest(`http://localhost:80/scripts/edit/${scriptId}`, "PATCH", subscription);
     window.location.href = '/scripts'
 }
 
+buttonAddConditionBlock.onclick = (event) => {
+    drawConditionBlock()
+    script.conditions.push(new Array())
+}
+
 function drawTimeCondition(time) {
-    let conditionList = document.getElementById("conditionsList")
+    let block = document.getElementById(`${current_block}`)
+    let conditionList = {}
+    for (let div of block.childNodes) {
+        if (div.id == "conditionsList") {
+            conditionList = div
+            break
+        }
+    }
     let ul_condition = document.createElement("ul")
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_1 = document.createElement("li")
@@ -340,7 +382,14 @@ function drawTimeCondition(time) {
 }
 
 function drawCondition(condition) {
-    let conditionList = document.getElementById("conditionsList")
+    let block = document.getElementById(`${current_block}`)
+    let conditionList = {}
+    for (let div of block.childNodes) {
+        if (div.id == "conditionsList") {
+            conditionList = div
+            break
+        }
+    }
     let ul_condition = document.createElement("ul")
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_subject = document.createElement("li")
@@ -367,12 +416,14 @@ function drawCondition(condition) {
 
 const deleteCondition = (e) => {
     const button = e.target
-    for (let cond of script.conditions) {
-        if (Object.values(cond).includes(button.id)) {
-            script.conditions.splice(script.conditions.indexOf(cond), 1)
-            document.getElementById(button.id).parentElement.remove()
-            console.log(script)
-            return
+    for (let cond_array of script.conditions) {
+        for (let cond of cond_array) {
+            if (Object.values(cond).includes(button.id)) {
+                cond_array.splice(cond_array.indexOf(cond), 1)
+                document.getElementById(button.id).parentElement.remove()
+                console.log(script)
+                return
+            }
         }
     }
 }
@@ -408,4 +459,40 @@ const deleteHandler = (e) => {
             return
         }
     }
+}
+
+function drawConditionBlock() {
+    let block = document.createElement('div')
+    block.id = `${block_num}`
+    let name_div = document.createElement('div')
+    name_div.className = "p-2 d-inline-block border border-2 border-warning rounded-3 w-75  mb-3"
+    let name = document.createElement('div')
+    name.className = "fs-4 text-center"
+    name.textContent = `Набор условий ${block_num}`
+    name_div.appendChild(name)
+    block.appendChild(name_div)
+    let button_div = document.createElement('div')
+    button_div.className = "mb-3"
+    let button = document.createElement('button')
+    button.id = "addCondition"
+    button.type = "button"
+    button.className = "btn btn-warning btn-lg me-2"
+    button.textContent = "Добавить условие"
+    button.addEventListener("click", (e) => {
+        const popupContent = popupFunctions.openPopup();
+        popupContent.append(elements.createFormTitle("Условие"));
+        popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
+        popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+        current_block = Number(block.id)
+        console.log(current_block)
+    });
+    button_div.appendChild(button)
+    block.appendChild(button_div)
+    let conditions = document.createElement('div')
+    conditions.className = "mb-3"
+    conditions.id = "conditionsList"
+    block.appendChild(conditions)
+    let conditionBlock = document.getElementById("ConditionBlocks")
+    conditionBlock.appendChild(block)
+    block_num++
 }
