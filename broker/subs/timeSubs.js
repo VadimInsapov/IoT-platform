@@ -11,7 +11,6 @@ function CreateTimeSub(time_sub) {
 async function CheckTimeSub(time_sub) {
 	let true_condition = true
 	if (time_sub.hasOwnProperty('subject')) {
-		const fullCondition_value = true
 		let bools_subs = new Array()
 		const logical = /(&&|\|\||\(|\))/
 		const symbols = /(<=|>=|!=|>|<|=)/
@@ -23,7 +22,8 @@ async function CheckTimeSub(time_sub) {
 				return response.json()
 			})
 			for (let type of existing_types) {
-				if (typePattern.test(type)) {
+				let changed_type_name = type[0].toUpperCase() + type.slice(1, -1)
+				if (typePattern.test(changed_type_name)) {
 					let entities = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${type}`).then(response => {
 						return response.json()
 					})
@@ -31,9 +31,7 @@ async function CheckTimeSub(time_sub) {
 						if (idPattern.test(entity._id)) {
 							if (subject.hasOwnProperty("condition")) {
 								const condition = subject["condition"].split(symbols)
-								const attribute = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${entity._id}/attrs/${condition[0]}`).then(response => {
-									return response.json()
-								})
+								const attribute = entity[condition[0]]
 								let checked_object = {}
 								checked_object["_id"] = entity._id
 								checked_object[condition[0]] = attribute
@@ -66,8 +64,7 @@ async function CheckTimeSub(time_sub) {
 						return response.json()
 					})
 					//console.log(handler_status)
-					if(handler_status.value != handler.command)
-					{
+					if (handler_status.value != handler.command) {
 						handler_sended = true
 						let data = {}
 						data["id"] = hand._id
@@ -86,15 +83,14 @@ async function CheckTimeSub(time_sub) {
 					}
 					else handler_sended = false
 					//console.log(handler_sended)
-			}
+				}
 			}
 		}
 	}
 	if (time_sub.hasOwnProperty('notification') && true_condition && handler_sended) {
 		let data = {}
 		data["idSub"] = time_sub._id
-		if(time_sub.hasOwnProperty("description")) data["nameSub"] = time_sub.description
-		Object.assign(data, changes)
+		if (time_sub.hasOwnProperty("description")) data["nameSub"] = time_sub.description
 		//console.log(data)
 		const notification_response = await fetch(time_sub.notification.url, {
 			method: "POST",
@@ -105,7 +101,7 @@ async function CheckTimeSub(time_sub) {
 		}).then(response => {
 			return response.json()
 		})
-}
+	}
 }
 
 module.exports = CreateTimeSub
