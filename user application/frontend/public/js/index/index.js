@@ -1,6 +1,6 @@
 import * as elements from "../elementsForPopup.js";
 import * as popupFunctions from "../popupFunctions.js";
-import {makeCommandHandlersForAllDevices, socketIndication} from "../indexAndRoomCommon.js";
+import {makeCommandHandlersForAllDevices, socketIndication, socketScript} from "../indexAndRoomCommon.js";
 import * as handlers from "./handlersForMakingPopup.js";
 import {handleCreateDevicePopup, handleCreateRoomPopup} from "./handlersForMakingPopup.js";
 import {handleCreateDevice, handleCreateRoom} from "./handlersForRequestsInsidePopup.js";
@@ -54,3 +54,4 @@ for (const device of devices) {
 
 const socket = io();
 socket.on("indication", (message) => socketIndication(message));
+socket.on("scripts", (message) => socketScript(message));

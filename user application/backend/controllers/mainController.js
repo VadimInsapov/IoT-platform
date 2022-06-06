@@ -29,7 +29,7 @@ exports.index = async function (request, response) {
     }
     const devices = await Promise.all(shortDevicesIds.map(async (deviceId) => await iotPlatform.getObjectById(deviceId)));
     await expandDeviceInfo(devices);
-    console.log(devices);
+    // console.log(devices);
     const shortRooms = rooms.map(item => ({
         id: item["_id"],
         roomName: item["roomName"].value
@@ -85,7 +85,7 @@ async function expandDeviceInfo(devices) {
             }
         }
     }));
-    console.log(devices);
+    // console.log(devices);
 }
 
 function getDeviceTypes(shortDevicesIds, filterType) {

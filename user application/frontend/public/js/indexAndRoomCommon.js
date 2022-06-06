@@ -42,6 +42,16 @@ export function socketIndication(message) {
     }
 }
 
+export function socketScript(message) {
+    console.log(message);
+    Toastify({
+        text: `Отработала подписка "${message.nameSub.toUpperCase()}"`,
+        duration: 3000,
+        className: "text-white text-center ps-5 pe-5 pb-4 pt-4 bg-primary opacity-75 rounded mt-2 fs-5",
+        selector: "notificationScript",
+    }).showToast();
+}
+
 function makeUpdatingCommand(button, command) {
     return async () => {
         const object = {

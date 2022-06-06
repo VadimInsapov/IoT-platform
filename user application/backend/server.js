@@ -23,9 +23,6 @@ app.set("view engine", "hbs");
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", mainController.index);
-app.post("/subscription/scripts", (req, res)=>{
-    console.log(req.body)
-})
 app.get("/devices", deviceController.index);
 app.get("/rooms/:roomId", roomController.index);
 app.get("/api/rooms/:roomId", roomController.getRoom);
@@ -48,6 +45,7 @@ app.get("/models", (req, res) => res.json(entities.models));
 app.post("/subscription/:typeSubscription", (req, res) => {
     const {typeSubscription} = req.params;
     if (typeSubscription === "indication") {
+        delete req.body.idSub;
         const device = req.body;
         const type = device["_id"].split(":")[1];
         const deviceMustBe = entities.typesOfDevices[type];
@@ -67,7 +65,6 @@ app.post("/subscription/:typeSubscription", (req, res) => {
             }
         }
     }
-    // console.log(req.body);
     io.sockets.emit(typeSubscription,req.body);
     res.status(200).json({answer:"OK"});
 });

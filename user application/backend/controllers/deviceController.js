@@ -72,7 +72,7 @@ exports.deleteRefRoom = async function (request, response) {
 };
 exports.updateDevice = async function (request, response) {
     try {
-        console.log(request.body)
+        // console.log(request.body)
         await iotPlatform.updateCommandInAgent(request.body);
         response.redirect("back");
     } catch (err) {

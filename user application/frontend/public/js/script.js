@@ -1,4 +1,5 @@
 import { makeRequest } from "./index/makeRequest.js";
+import {socketScript} from "./indexAndRoomCommon.js";
 
 const scripts = document.getElementsByClassName("script");
 for (const script of scripts) {
@@ -13,3 +14,6 @@ for (const script of scripts) {
         location.reload();
     }
 }
+
+const socket = io();
+socket.on("scripts", (message) => socketScript(message));
