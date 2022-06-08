@@ -4,8 +4,11 @@ const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
 
 function CreateTimeSub(time_sub) {
-	const job = new CronJob(`0 ${time_sub.time["minute"]} ${time_sub.time["hour"]} * * ${time_sub.time["days"]}`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
-	job.start();
+	for(let time of time_sub.time){
+		console.log(time)
+		const job = new CronJob(`0 ${time["minute"]} ${time["hour"]} * * ${time["days"]}`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
+		job.start();
+	}
 }
 
 async function CheckTimeSub(time_sub) {
@@ -53,6 +56,7 @@ async function CheckTimeSub(time_sub) {
 	}
 	let handler_sended = true
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
+		console.log(time_sub)
 		for (let handler of time_sub.handler) {
 			const idPattern = new RegExp(handler.id)
 			let probably_handlers = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${handler["id"].split(":")[1]}`).then(response => {

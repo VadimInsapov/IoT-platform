@@ -2,7 +2,7 @@ import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
 import { makeRequest } from "./index/makeRequest.js";
 
-const buttonAddCondition = document.getElementById("addCondition");
+//const buttonAddCondition = document.getElementById("addCondition");
 const buttonAddCommand = document.getElementById("addCommand");
 const buttonCreateSub = document.getElementById("createSub")
 const buttonAddConditionBlock = document.getElementById("addConditionBlock")
@@ -10,17 +10,18 @@ const buttonAddConditionBlock = document.getElementById("addConditionBlock")
 let block_num = 2
 let current_block = 1
 const script = {
+    time: [],
     conditions: [[]],
     handlers: [],
 }
-buttonAddCondition.addEventListener("click", (e) => {
-    const popupContent = popupFunctions.openPopup();
-    popupContent.append(elements.createFormTitle("Условие"));
-    popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
-    popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
-    current_block = 1
-    console.log(current_block)
-});
+// buttonAddCondition.addEventListener("click", (e) => {
+//     const popupContent = popupFunctions.openPopup();
+//     popupContent.append(elements.createFormTitle("Условие"));
+//     popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
+//     popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+//     current_block = 1
+//     console.log(current_block)
+// });
 
 buttonAddCommand.addEventListener("click", (e) => {
     const popupContent = popupFunctions.openPopup();
@@ -34,7 +35,7 @@ buttonAddCommand.addEventListener("click", (e) => {
 
 document.addEventListener("click", async (e) => {
     if (e.target && e.target.id == 'timeCondition') {
-        popupFunctions.closePopup(e);
+        //popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
         popupContent.append(elements.createFormTitle("Условие: время"));
         popupContent.append(elements.createDaysCheckboxs())
@@ -50,6 +51,8 @@ document.addEventListener("click", async (e) => {
             id: "typeCondition"
         }));
         popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "defDeviceCondition" }));
+        current_block = 1
+        console.log(current_block)
     }
     if (e.target && e.target.id == 'typeCondition') {
         popupFunctions.closePopup(e);
@@ -96,7 +99,7 @@ document.addEventListener("click", async (e) => {
             value_days: value_days
         }
         cond["id"] = `${current_block} condition ${cond["hour"]} ${cond["minute"]} ${cond["value_days"]}`
-        script.conditions[current_block - 1].push(cond)
+        script.time.push(cond)
         console.log(script);
         popupFunctions.closePopup(e);
         drawTimeCondition(cond)
@@ -187,16 +190,19 @@ buttonCreateSub.onclick = async (event) => {
     subscription["subject"] = []
     subscription["handler"] = []
     let full_cond = ""
+    if(script.time.length!=0){
+        subscription["time"] = []
+        for(let time of script.time){
+            let cond = {}
+            cond["hour"] = time["hour"]
+            cond["minute"] = time["minute"]
+            cond["days"] = time["value_days"]
+            subscription["time"].push(cond)
+        }
+    }
     for (let cond_array of script.conditions) {
         if (cond_array.length != 0) {
             for (let cond of cond_array) {
-                if (cond["type"] == "time") {
-                    let time = {}
-                    time["hour"] = cond["hour"]
-                    time["minute"] = cond["minute"]
-                    time["days"] = cond["value_days"]
-                    subscription["time"] = time
-                } else {
                     let subject = {}
                     subject["idPattern"] = cond["idPattern"]
                     subject["typePattern"] = cond["typePattern"]
@@ -206,7 +212,6 @@ buttonCreateSub.onclick = async (event) => {
                     subscription["subject"].push(subject)
                     full_cond += counter + "&&"
                     counter++
-                }
             }
             full_cond = full_cond.slice(0, -2)
             full_cond += "||"
@@ -232,14 +237,7 @@ buttonAddConditionBlock.onclick = (event) => {
 }
 
 function drawTimeCondition(time) {
-    let block = document.getElementById(`${current_block}`)
-    let conditionList = {}
-    for (let div of block.childNodes) {
-        if (div.id == "conditionsList") {
-            conditionList = div
-            break
-        }
-    }
+    let conditionList = document.getElementById("timeList")
     let ul_condition = document.createElement("ul")
     ul_condition.className = "list-group list-group-horizontal"
     let li_condition_1 = document.createElement("li")
@@ -251,12 +249,25 @@ function drawTimeCondition(time) {
     let button = document.createElement("button")
     button.className = "btn-close"
     button.id = time["id"]
-    button.addEventListener("click", deleteCondition)
+    button.addEventListener("click", deleteTimeCondition)
     ul_condition.appendChild(li_condition_1)
     ul_condition.appendChild(li_condition_2)
     ul_condition.appendChild(button)
     conditionList.appendChild(ul_condition)
 }
+
+const deleteTimeCondition = (e) => {
+    const button = e.target
+    for (let cond of script.time) {
+            if (Object.values(cond).includes(button.id)) {
+                script.time.splice(script.time.indexOf(cond), 1)
+                document.getElementById(button.id).parentElement.remove()
+                console.log(script)
+                return
+            }
+    }
+}
+
 
 function drawCondition(condition) {
     let block = document.getElementById(`${current_block}`)
@@ -355,10 +366,14 @@ function drawConditionBlock() {
     button.className = "btn btn-warning btn-lg me-2"
     button.textContent = "Добавить условие"
     button.addEventListener("click", (e) => {
+        popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
-        popupContent.append(elements.createFormTitle("Условие"));
-        popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
-        popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
+        popupContent.append(elements.createFormTitle("Условие: данные устройства"));
+        popupContent.append(elements.createFormButton("Выбрать по типу устройств", {
+            classNames: ['mb-3'],
+            id: "typeCondition"
+        }));
+        popupContent.append(elements.createFormButton("Выбрать определённое устройство", { id: "defDeviceCondition" }));
         current_block = Number(block.id)
         console.log(current_block)
     });
