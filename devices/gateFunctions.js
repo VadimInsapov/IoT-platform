@@ -7,11 +7,15 @@ exports.makeDoor = () => {
         getState() {
             return this.state;
         },
-        setState(newState) {
-            if (newState === this.state) throw new SyntaxError(`The ${this.name} is already ${this.getState().toUpperCase()}!\n`);
-            if (this.state === "lock" && newState === "open") throw  new Error(`The ${this.name} is ${this.getState().toUpperCase()}, you can't OPEN!\n`);
-            if (this.state === "lock" && newState === "close") throw  new Error(`The ${this.name} is already ${this.getState().toUpperCase()}!\n`);
-            this.state = newState;
+        setState(command) {
+            if (command === this.state) throw new SyntaxError(`The ${this.name} is already ${this.getState().toUpperCase()}!\n`);
+            if (this.state === "lock" && command === "open") throw  new Error(`The ${this.name} is ${this.getState().toUpperCase()}, you can't OPEN!\n`);
+            if (this.state === "lock" && command === "close") throw  new Error(`The ${this.name} is already ${this.getState().toUpperCase()}!\n`);
+            if (command === "unlock") {
+                this.state = "close";
+                return true;
+            }
+            this.state = command;
             return true;
         },
         includeCommand: function (command) {

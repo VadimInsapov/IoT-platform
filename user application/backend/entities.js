@@ -124,7 +124,6 @@ exports.typesOfDevices = {
                 value: (item) => {
                     if (item === "open") return "Открыто";
                     if (item === "close") return "Закрыто";
-                    if (item === "unlock") return "Разблакировано";
                     if (item === "lock") return "Заблокировано";
                 },
                 commandsDependsOnAttribute: (item) => {
@@ -157,22 +156,6 @@ exports.typesOfDevices = {
                             {
                                 name: "unlock",
                                 russianName: "Разблокировать",
-                            },
-                        ]
-                    }
-                    if (item === "unlock") {
-                        return [
-                            {
-                                name: "open",
-                                russianName: "Открыть",
-                            },
-                            {
-                                name: "lock",
-                                russianName: "Заблокировать",
-                            },
-                            {
-                                name: "close",
-                                russianName: "Закрыть",
                             },
                         ]
                     }
