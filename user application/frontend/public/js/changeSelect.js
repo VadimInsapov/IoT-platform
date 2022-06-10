@@ -14,7 +14,7 @@ export function changeSelectType() {
 			break
 		}
 		case "Motion": {
-			attributes = [{ value: "count", text: "Количество" }]
+			attributes = [{ value: "count", text: "Присутствие" }]
 			break
 		}
 		case "Door": {
