@@ -351,13 +351,8 @@ const deleteHandler = (e) => {
 function drawConditionBlock() {
     let block = document.createElement('div')
     block.id = `${block_num}`
-    let name_div = document.createElement('div')
-    name_div.className = "p-2 d-inline-block border border-2 border-warning rounded-3 w-75  mb-3"
-    let name = document.createElement('div')
-    name.className = "fs-4 text-center"
-    name.textContent = `Набор условий ${block_num}`
-    name_div.appendChild(name)
-    block.appendChild(name_div)
+    let head_div = document.createElement('div')
+    head_div.className = "d-flex"
     let button_div = document.createElement('div')
     button_div.className = "mb-3"
     let button = document.createElement('button')
@@ -378,7 +373,15 @@ function drawConditionBlock() {
         console.log(current_block)
     });
     button_div.appendChild(button)
-    block.appendChild(button_div)
+    head_div.appendChild(button_div)
+    let name_div = document.createElement('div')
+    name_div.className = "p-2 d-inline-block border border-2 border-warning rounded-3 w-75  mb-3"
+    let name = document.createElement('div')
+    name.className = "fs-4 text-center"
+    name.textContent = `Набор условий ${block_num}`
+    name_div.appendChild(name)
+    head_div.appendChild(name_div)
+    block.appendChild(head_div)
     let conditions = document.createElement('div')
     conditions.className = "mb-3"
     conditions.id = "conditionsList"
