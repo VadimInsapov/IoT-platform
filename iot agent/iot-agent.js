@@ -5,12 +5,14 @@ const appNorth = express();
 const jsonParser = express.json();
 const expressValidator = require('express-validator');
 const mqtt = require('mqtt');
-const mqttClient = mqtt.connect('mqtt://localhost:1883');
+const mqttBrokerAddress = process.argv[2] || "localhost";
+const mqttClient = mqtt.connect(`mqtt://${mqttBrokerAddress}:1883`);
 const deviceController = require('./controllers/userApplication/deviceController');
 const httpController = require('./controllers/iotClients/httpClients/httpController');
 const mqttController = require('./controllers/iotClients/mqttClients/mqttController');
 const brokerController = require('./controllers/broker/brokerController');
 const mongoose = require("mongoose");
+
 
 appSouth.use(jsonParser);
 appSouth.use(cors());

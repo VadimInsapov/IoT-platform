@@ -10,14 +10,16 @@ exports.getBrokerAttributes = (iotAgentDeviceValue, clientAttributes) => {
         let type = iotAgentAttributes[mqttAttr].type;
         let newValue = clientAttributes[mqttAttr];
         if (type === "number") {
-            newValue = +newValue
+            if (!isNaN(+newValue)) {
+                newValue = +newValue;
+            }
         } else if (type === "text") {
             newValue = String(newValue);
         } else if (type === "boolean") {
             if (newValue === "true" || newValue === "false") {
                 newValue = Boolean(newValue);
             }
-        };
+        }
         brokerNewAttributes[newAttr] = newValue;
     }
     return brokerNewAttributes;

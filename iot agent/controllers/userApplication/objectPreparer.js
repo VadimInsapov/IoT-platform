@@ -22,11 +22,10 @@ module.exports = (body) => {
     }
     for (const relation of relationships) {
         const refBrokerId = relation.value;
-        const type = refBrokerId.split(':')[1];
         const propertyName = relation.name;
         device[propertyName] = {};
-        device[propertyName]["$ref"] = type;
-        device[propertyName]["id"] = refBrokerId;
+        device[propertyName]["type"] = "relationship";
+        device[propertyName]["value"] = refBrokerId;
     }
     return device;
 }

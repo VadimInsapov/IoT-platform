@@ -12,7 +12,8 @@ export async function handleCreateDevice(e) {
         "model": deviceModel,
     }
     if (document.getElementById("endpoint")) {
-        device.endpoint =  document.getElementById("endpoint").value;
+        const hostAddress = document.getElementById("endpoint").value
+        device.endpoint =  `http://${hostAddress}/macAddress/commands`;
     }
     console.log(device);
     await makeRequest("http://localhost:80/devices", "POST", device);

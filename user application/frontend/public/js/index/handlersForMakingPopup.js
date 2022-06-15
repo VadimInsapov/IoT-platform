@@ -19,7 +19,7 @@ export async function handleCreateDevicePopup(e) {
     selectWithModels.addEventListener('change', (e) => {
         models.find(item => {
             if (item.name === e.target.value && item.requirements.includes("endpoint")) {
-                selectWithModels.after(elements.createInput("Конечная точка", "", {id: "endpoint"}));
+                selectWithModels.after(elements.createInput("Адрес хоста", "", {id: "endpoint"}));
             } else if (item.name === e.target.value && !item.requirements.includes("endpoint")) {
                 const endPoint = document.getElementById("endPoint");
                 if (endPoint) {
