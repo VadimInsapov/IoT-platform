@@ -95,7 +95,9 @@ async function CheckSubscriptionsWithChanges(changes) {
 			//console.log(fullCondition_value)
 		}
 		//console.log(sub)
-		let handler_sended = true
+		//let handler_sended = true
+		
+		//console.log(fullCondition_value)
 		if (sub.hasOwnProperty("handler") && fullCondition_value) {
 			for (let handler of sub.handler) {
 				const idPattern = new RegExp(handler.id)
@@ -105,11 +107,11 @@ async function CheckSubscriptionsWithChanges(changes) {
 				for (let hand of probably_handlers) {
 					//console.log(hand)
 					if (idPattern.test(hand._id)) {
-						let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
-							return response.json()
-						})
+						// let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
+						// 	return response.json()
+						// })
 						//console.log(handler_status)
-						if (handler_status.value != handler.command) {
+						//if (handler_status.value != handler.command) {
 							handler_sended = true
 							let data = {}
 							data["id"] = hand._id
@@ -125,14 +127,14 @@ async function CheckSubscriptionsWithChanges(changes) {
 								return response.json()
 							})
 							//console.log(handler_response)
-						}
-						else handler_sended = false
+						//}
+						//else handler_sended = false
 						//console.log(handler_sended)
 					}
 				}
 			}
 		}
-		if (sub.hasOwnProperty("notification") && handler_sended && fullCondition_value) {
+		if (sub.hasOwnProperty("notification")  && fullCondition_value) {
 			let data = {}
 			data["idSub"] = sub._id
 			if (sub.hasOwnProperty("description")) data["nameSub"] = sub.description

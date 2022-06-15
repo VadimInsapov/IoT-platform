@@ -59,7 +59,7 @@ async function CheckTimeSub(time_sub) {
 			true_condition = eval(fullCondition.join(''))
 		}
 	}
-	let handler_sended = true
+	//let handler_sended = true
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
 		//console.log(time_sub)
 		for (let handler of time_sub.handler) {
@@ -69,11 +69,11 @@ async function CheckTimeSub(time_sub) {
 			})
 			for (let hand of probably_handlers) {
 				if (idPattern.test(hand._id)) {
-					let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
-						return response.json()
-					})
+					// let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
+					// 	return response.json()
+					// })
 					//console.log(handler_status)
-					if (handler_status.value != handler.command) {
+					// if (handler_status.value != handler.command) {
 						handler_sended = true
 						let data = {}
 						data["id"] = hand._id
@@ -89,8 +89,8 @@ async function CheckTimeSub(time_sub) {
 							return response.json()
 						})
 						//console.log(handler_response)
-					}
-					else handler_sended = false
+					// }
+					// else handler_sended = false
 					//console.log(handler_sended)
 				}
 			}
@@ -99,7 +99,7 @@ async function CheckTimeSub(time_sub) {
 	//console.log(true_condition)
 	//console.log(handler_sended)
 
-	if (time_sub.hasOwnProperty('notification') && true_condition && handler_sended) {
+	if (time_sub.hasOwnProperty('notification') && true_condition) {
 		//console.log(time_sub)
 		let data = {}
 		data["idSub"] = time_sub._id
