@@ -1,3 +1,5 @@
+const dgram = require('dgram');
+const socketDevice = dgram.createSocket("udp4");
 const mqtt = require('mqtt');
 const readline = require("readline");
 const infoDevice = require("../infoDevice");
@@ -7,10 +9,10 @@ const input = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
 });
-function loop () {
+function loop (mqttClient, topicAttributes) {
     input.question("Enter command: ", (command) => {
         validateCommandAndSendNewState(door, command, "mqtt", mqttClient, topicAttributes);
-        loop();
+        loop(mqttClient, topicAttributes);
     });
 }
 const shortDeviceInfo = {
@@ -26,17 +28,36 @@ const shortDeviceInfo = {
     }
 };
 const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
-const {topicAttributes, topicCommands, brokerSettings} = fullDeviceInfo;
+const {topicAttributes} = fullDeviceInfo;
 console.log(fullDeviceInfo);
+socketDevice.on('message', (message, serverInfo) => {
+    message = JSON.parse(message);
+    if (fullDeviceInfo.macAddress !== message.deviceId) {
+        return;
+    }
+    console.log(message);
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address);
+    socketDevice.close();
+    const mqttClient = mqtt.connect(message.brokerAddress);
+    mqttClient.on('connect', () => {
+        console.log("The Device connected successfully!");
+        const topicAttributes = message.topicAttributes;
+        mqttClient.subscribe(message.topicCommands);
+        loop(mqttClient, topicAttributes);
+    });
+    mqttClient.on('message', (topic, messageFromBroker) => {
+        let {command} = JSON.parse(messageFromBroker);
+        const topicAttributes = message.topicAttributes;
+        validateCommandAndSendNewState(door, command, "mqtt", mqttClient, topicAttributes);
+    });
+
+});
+socketDevice.on('listening', () => {
+    socketDevice.setBroadcast(true);
+    console.log(`server listening ${socketDevice.address().address}:${socketDevice.address().port}`);
+});
+socketDevice.bind({
+    port: 8000,
+});
 
 
-const mqttClient = mqtt.connect(brokerSettings);
-mqttClient.on('connect', () => {
-    console.log("The Device connected successfully!");
-    mqttClient.subscribe(topicCommands);
-    loop();
-});
-mqttClient.on('message', (topic, message) => {
-    let {command} = JSON.parse(message);
-    validateCommandAndSendNewState(door, command, "mqtt", mqttClient, topicAttributes);
-});

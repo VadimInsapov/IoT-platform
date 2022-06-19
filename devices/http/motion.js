@@ -1,4 +1,5 @@
 const axios = require('axios').default;
+const dgram = require('dgram');
 const infoDevice = require('../infoDevice');
 const readline = require("readline");
 const shortDeviceInfo = {
@@ -15,7 +16,7 @@ const shortDeviceInfo = {
 };
 const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);
 console.log(fullDeviceInfo);
-const {iotAgentEndpoint} = fullDeviceInfo;
+let iotAgentEndpoint = "";
 const input = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -38,7 +39,26 @@ function loop() {
         loop();
     });
 };
+const socketDevice = dgram.createSocket("udp4");
+socketDevice.on('message', (message, serverInfo) => {
+    console.log(`server got: ${message} from ${serverInfo.address}:${serverInfo.port}`);
+    message = JSON.parse(message);
+    if (fullDeviceInfo.macAddress !== message.deviceId) {
+        return;
+    }
+    iotAgentEndpoint = message.serverAddress;
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {});
+    socketDevice.close();
+});
+socketDevice.on('listening', () => {
+    socketDevice.setBroadcast(true);
+    console.log(`server listening ${socketDevice.address().address}:${socketDevice.address().port}`);
+});
+socketDevice.bind({
+    port: 8000,
+});
 function sendData(message) {
+    if (!iotAgentEndpoint) return;
     axios.post(iotAgentEndpoint, message)
         .catch(err => {
             console.log(err.response.status);

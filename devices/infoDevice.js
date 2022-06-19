@@ -1,5 +1,4 @@
 require('dotenv').config();
-const getMqttSensorTopic = (macId) => `/${macId}/attributes`;
 const getMqttActuatorTopic = (macId) => `/${macId}/commands`;
 const getHttpActuatorSettings = (name) => {
     let port = 3001;
@@ -17,21 +16,8 @@ const getHttpActuatorSettings = (name) => {
         port: port
     }
 };
-const getIoTAgentNorthSettings = () => {
-    return {
-        host: process.env.IOT_AGENT_HOST,
-        port: +process.env.IOT_AGENT_NORTH_PORT
-    }
-};
-const getMqttBrokerSettings = () => {
-    return {
-        host: process.env.BROKER_HOST,
-        port: +process.env.BROKER_PORT
-    }
-};
-const getIotAgentEndpoint = (macId) => {
-    const {host, port} = getIoTAgentNorthSettings();
-    return `http://${host}:${port}${process.env.IOT_AGENT_HOST_ROUTE}?deviceId=${macId}`;
+module.exports.getIotAgentEndpoint = (hostAddress, macId) => {
+    return `http://${hostAddress}${process.env.IOT_AGENT_HOST_ROUTE}?deviceId=${macId}`;
 };
 const getHttpActuatorEndpoint = (macId, name) => {
     const {host, port} = getHttpActuatorSettings(name);
@@ -46,33 +32,17 @@ module.exports.getDevice = (device) => {
     obj["name"] = name;
     obj["type"] = type;
     obj["macAddress"] = macAddress;
-    if (transport === "MQTT") {
-        obj["brokerSettings"] = getMqttBrokerSettings();
-        if (type === "Sensor") {
-            obj["topic"] = getMqttSensorTopic(macAddress);
-        }
-        if (type === "Actuator") {
-            obj["topic"] = getMqttActuatorTopic(macAddress);
-        }
-        if (type === "Gate") {
-            obj["topicAttributes"] = getMqttSensorTopic(macAddress);
-            obj["topicCommands"] = getMqttActuatorTopic(macAddress);
-        }
-    }
     if (transport === "HTTP") {
         if (type === "Sensor") {
-            obj["iotAgentSetting"] = getIoTAgentNorthSettings(macAddress);
-            obj["iotAgentEndpoint"] = getIotAgentEndpoint(macAddress);
+            // obj["iotAgentSetting"] = getIoTAgentNorthSettings(macAddress);
+            // obj["iotAgentEndpoint"] = module.exports.getIotAgentEndpoint(macAddress);
         }
         if (type === "Actuator") {
-            console.log(name)
             obj["actuatorSettings"] = getHttpActuatorSettings(name);
             obj["deviceRoute"] = getHttpActuatorRoute(macAddress);
             obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress, name);
         }
         if (type === "Gate") {
-            obj["iotAgentSetting"] = getIoTAgentNorthSettings(macAddress);
-            obj["iotAgentEndpoint"] = getIotAgentEndpoint(macAddress);
             obj["actuatorSettings"] = getHttpActuatorSettings(name);
             obj["deviceRoute"] = getHttpActuatorRoute(macAddress);
             obj["deviceEndPoint"] = getHttpActuatorEndpoint(macAddress, name);
@@ -84,6 +54,5 @@ module.exports.getDevice = (device) => {
 module.exports.getBroker = (brokerInfo) => {
     return {
         name: brokerInfo.name,
-        brokerSettings: getMqttBrokerSettings(),
     }
 };

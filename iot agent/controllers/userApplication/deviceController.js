@@ -1,3 +1,5 @@
+const dgram = require('dgram');
+
 const IoTAgentDevice = require('../../models/IoTAgentDevice.js');
 const mongoose = require("mongoose");
 const objectScheme = require("../../models/ObjectScheme");
@@ -7,29 +9,85 @@ const objectPreparer = require("./objectPreparer");
 const models = require("./models");
 const sendResponseWithErrors = (response, errors) => response.status(400).json({errors: errors.array()});
 
+const clientSocket = dgram.createSocket("udp4");
+clientSocket.bind(() => clientSocket.setBroadcast(true));
+
+function CloseSocket(socketIoTAgent) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            socketIoTAgent.close();
+            resolve();
+        }, 3000);
+    });
+}
+
+async function PairingWithDevice(body) {
+    const {deviceId, entityType, transport: protocol, dynamicAttributes = "", commands = ""} = body;
+    const socketIoTAgent = dgram.createSocket("udp4");
+    socketIoTAgent.bind(() => socketIoTAgent.setBroadcast(true));
+    let gotMessageFromDevice = false;
+    const initializationDataForDevice = {};
+    initializationDataForDevice['deviceId'] = deviceId;
+    if (protocol == "MQTT") {
+        initializationDataForDevice['brokerAddress'] = `mqtt://${global.mqttBrokerAddress}:1883`;
+        if (dynamicAttributes) {
+            initializationDataForDevice['topicAttributes'] = `/${deviceId}/attributes`;
+        }
+        if (commands) {
+            initializationDataForDevice['topicCommands'] = `/${deviceId}/commands`;
+        }
+    }
+    if (protocol == "HTTP") {
+        if (dynamicAttributes) {
+            initializationDataForDevice['serverAddress'] = `http://127.0.0.1:7896/iot?deviceId=${deviceId}`;
+        }
+    }
+
+    socketIoTAgent.send(JSON.stringify(initializationDataForDevice), 8000, "255.255.255.255");
+    socketIoTAgent.on('message', (msg, rinfo) => {
+        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+        gotMessageFromDevice = true;
+    });
+    socketIoTAgent.on('listening', () => {
+    });
+    await CloseSocket(socketIoTAgent);
+    return gotMessageFromDevice;
+}
+
 exports.addDevice = function (mqttClient) {
-    return function (request, response) {
+    return async function (request, response) {
         const errors = validationResult(request);
         if (!errors.isEmpty()) {
             sendResponseWithErrors(response, errors);
             return;
         }
-        const {deviceId, entityType, transport: protocol} = request.body;
-        if (protocol === "MQTT") {
-            mqttClient.subscribe(`/${deviceId}/attributes`);
-        }
-        const Device = mongoose.model(entityType, objectScheme);
-        const device = new Device(objectPreparer(request.body));
-        device.save(function (err, doc) {
-            if (err) return logger.showError(err);
+        try {
+            const {deviceId, entityType, transport: protocol} = request.body;
+            const gotMessageFromDevice = PairingWithDevice(request.body);
+            if (!gotMessageFromDevice) {
+                response.status(400).send("The device wasn't found in local network!");
+                console.log("The device wasn't found in local network!");
+                return;
+            }
+            if (protocol === "MQTT") {
+                mqttClient.subscribe(`/${deviceId}/attributes`);
+            }
+            const Device = mongoose.model(entityType, objectScheme);
+            const device = new Device(objectPreparer(request.body));
+            const doc = await device.save();
             const entityName = doc["_id"];
-            if (!("entityName" in request.body)) request.body = {...request.body, entityName}
+            if (!("entityName" in request.body)) {
+                request.body = {...request.body, entityName}
+            }
             const iotAgentDevice = new IoTAgentDevice(request.body);
             iotAgentDevice.save();
             logger.deviceWasMadeByUser(deviceId);
             logger.showAll(IoTAgentDevice);
             response.status(200).json(request.body);
-        });
+        } catch (err) {
+            logger.showError(err);
+            response.status(400).send(err);
+        }
     }
 };
 
