@@ -17,12 +17,15 @@ module.exports = class IoTAgentDevice {
     static find(deviceId) {
         return IoTAgentDevices.get(deviceId);
     }
+
     static getBrokerId(deviceId) {
         return this.find(deviceId).entityName;
     }
+
     static getProtocol(deviceId) {
         return this.find(deviceId).protocol;
     }
+
     static delete(deviceId) {
         return IoTAgentDevices.delete(deviceId);
     }
@@ -37,12 +40,14 @@ module.exports = class IoTAgentDevice {
         }
         return false;
     }
+
     static getProtocolByEntityName(entityName) {
         for (let [key, value] of IoTAgentDevices.entries()) {
             if (value.entityName === entityName)
                 return value.protocol;
         }
     }
+
     static getEndpointByEntityName(entityName) {
         for (let [key, value] of IoTAgentDevices.entries()) {
             if (value.entityName === entityName)
@@ -57,6 +62,7 @@ module.exports = class IoTAgentDevice {
     static getAll() {
         return IoTAgentDevices;
     }
+
     static getAllShort() {
         const obj = {}
         for (let [key, value] of IoTAgentDevices) {
@@ -72,10 +78,7 @@ module.exports = class IoTAgentDevice {
         a["protocol"] = protocol;
         if (dynamicAttributes.length !== 0) a["attributes"] = this.getAttributes(dynamicAttributes);
         if (commands.length !== 0) a["commands"] = this.getCommands(commands);
-        if (endpoint !== "") a["endpoint"] = endpoint
-        else {
-            a["endpoint"] = `http://${addressDevice}/${deviceId}/commands`
-        };
+        if (endpoint !== "") a["endpoint"] = `http://${addressDevice}${endpoint}`;
         return a;
     }
 

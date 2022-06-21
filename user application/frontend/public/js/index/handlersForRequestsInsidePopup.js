@@ -11,10 +11,7 @@ export async function handleCreateDevice(e) {
         "deviceId": macAddress,
         "model": deviceModel,
     }
-    if (document.getElementById("endpoint")) {
-        const hostAddress = document.getElementById("endpoint").value
-        device.endpoint =  `http://${hostAddress}/macAddress/commands`;
-    }
+    device.endpoint =  `/${macAddress}/commands`;
     console.log(device);
     await makeRequest("http://localhost:80/devices", "POST", device);
     popupFunctions.closePopup(e);
