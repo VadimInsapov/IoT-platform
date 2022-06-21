@@ -1,9 +1,14 @@
 const axios = require('axios').default;
-exports.sendHttpCommand = (endpoint, command, responseForBroker) => {
+exports.sendHttpCommand = (httpActuatorSettings, command, responseForBroker) => {
     const message = {}
     message['command'] = command;
-    console.log(endpoint)
-    axios.post(endpoint, message)
+    console.log(httpActuatorSettings)
+
+    axios({
+        method: httpActuatorSettings.method,
+        url: httpActuatorSettings.URL,
+        data: message
+    })
         .catch(err => {
             responseForBroker.status(400).json(`The device is not available`);
         });

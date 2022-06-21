@@ -14,9 +14,9 @@ exports.updateState = function (mqttClient) {
             response.status(400).json(`The object ${entityName} doesn't include command ${command}!`);
             return;
         }
-        const endpoint = Device.getEndpointByEntityName(entityName);
-        if (endpoint) {
-            senderCommands.sendHttpCommand(endpoint, command, response);
+        const httpActuatorSettings = Device.getHttpActuatorSettingsByEntityName(entityName);
+        if (httpActuatorSettings) {
+            senderCommands.sendHttpCommand(httpActuatorSettings, command, response);
         } else {
             senderCommands.sendMqttCommand(mqttClient, deviceId, command, response);
         }

@@ -6,12 +6,12 @@ module.exports = class IoTAgentDevice {
             deviceId,
             entityName,
             transport: protocol,
-            endpoint = "",
+            httpActuatorSettings = "",
             dynamicAttributes = [],
             commands = []
         } = body;
         this.key = deviceId;
-        this.value = this.getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands, addressDevice, deviceId);
+        this.value = this.getValueForDevices(entityName, protocol, httpActuatorSettings, dynamicAttributes, commands, addressDevice, deviceId);
     }
 
     static find(deviceId) {
@@ -48,10 +48,10 @@ module.exports = class IoTAgentDevice {
         }
     }
 
-    static getEndpointByEntityName(entityName) {
+    static getHttpActuatorSettingsByEntityName(entityName) {
         for (let [key, value] of IoTAgentDevices.entries()) {
             if (value.entityName === entityName)
-                return value.endpoint;
+                return value.httpActuatorSettings;
         }
     }
 
@@ -72,13 +72,19 @@ module.exports = class IoTAgentDevice {
     }
 
 
-    getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands, addressDevice, deviceId) {
+    getValueForDevices(entityName, protocol, httpActuatorSettings, dynamicAttributes, commands, addressDevice, deviceId) {
         let a = {};
         a["entityName"] = entityName;
         a["protocol"] = protocol;
         if (dynamicAttributes.length !== 0) a["attributes"] = this.getAttributes(dynamicAttributes);
         if (commands.length !== 0) a["commands"] = this.getCommands(commands);
-        if (endpoint !== "") a["endpoint"] = `http://${addressDevice}${endpoint}`;
+        if (httpActuatorSettings !== "") {
+            const {route, method} = httpActuatorSettings;
+            a["httpActuatorSettings"] = {
+                URL: `http://${addressDevice}${route}`,
+                method: method,
+            }
+        }
         return a;
     }
 

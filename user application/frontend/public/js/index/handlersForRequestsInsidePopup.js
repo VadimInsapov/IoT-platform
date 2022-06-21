@@ -11,7 +11,10 @@ export async function handleCreateDevice(e) {
         "deviceId": macAddress,
         "model": deviceModel,
     }
-    device.endpoint =  `/${macAddress}/commands`;
+    device.httpActuatorSettings =  {
+        route: `/${macAddress}/commands`,
+        method: `POST`,
+    };
     console.log(device);
     await makeRequest("http://localhost:80/devices", "POST", device);
     popupFunctions.closePopup(e);
