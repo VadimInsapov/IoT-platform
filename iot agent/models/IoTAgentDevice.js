@@ -1,7 +1,7 @@
 const IoTAgentDevices = new Map();
 
 module.exports = class IoTAgentDevice {
-    constructor(body) {
+    constructor(body, addressDevice) {
         const {
             deviceId,
             entityName,
@@ -11,7 +11,7 @@ module.exports = class IoTAgentDevice {
             commands = []
         } = body;
         this.key = deviceId;
-        this.value = this.getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands);
+        this.value = this.getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands, addressDevice, deviceId);
     }
 
     static find(deviceId) {
@@ -66,13 +66,16 @@ module.exports = class IoTAgentDevice {
     }
 
 
-    getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands) {
+    getValueForDevices(entityName, protocol, endpoint, dynamicAttributes, commands, addressDevice, deviceId) {
         let a = {};
         a["entityName"] = entityName;
         a["protocol"] = protocol;
         if (dynamicAttributes.length !== 0) a["attributes"] = this.getAttributes(dynamicAttributes);
         if (commands.length !== 0) a["commands"] = this.getCommands(commands);
-        if (endpoint !== "") a["endpoint"] = endpoint;
+        if (endpoint !== "") a["endpoint"] = endpoint
+        else {
+            a["endpoint"] = `http://${addressDevice}/${deviceId}/commands`
+        };
         return a;
     }
 

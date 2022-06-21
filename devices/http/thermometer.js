@@ -30,8 +30,9 @@ socketDevice.on('message', (message, serverInfo) => {
     const iotAgentEndpoint = message.serverAddress;
 
     console.log(`iotAgentEndpoint: ${iotAgentEndpoint}\n`);
-    socketDevice.send("Ok", serverInfo.port, serverInfo.address);
-    socketDevice.close();
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {
+        socketDevice.close();
+    });
     setInterval(() => {
         const newData = thermometerFunctions.getMessage();
         console.log(newData);

@@ -16,20 +16,20 @@ export async function handleCreateDevicePopup(e) {
         {id: "deviceModel"}
     )
     popupContent.append(selectWithModels);
-    selectWithModels.addEventListener('change', (e) => {
-        models.find(item => {
-            if (item.name === e.target.value && item.requirements.includes("endpoint")) {
-                selectWithModels.after(elements.createInput("Адрес хоста", "", {id: "endpoint"}));
-            } else if (item.name === e.target.value && !item.requirements.includes("endpoint")) {
-                const endPoint = document.getElementById("endPoint");
-                if (endPoint) {
-                    endPoint.previousSibling.remove();
-                    endPoint.remove();
-                }
-            }
-        })
-
-    });
+    // selectWithModels.addEventListener('change', (e) => {
+    //     models.find(item => {
+    //         if (item.name === e.target.value && item.requirements.includes("endpoint")) {
+    //             selectWithModels.after(elements.createInput("Адрес хоста", "", {id: "endpoint"}));
+    //         } else if (item.name === e.target.value && !item.requirements.includes("endpoint")) {
+    //             const endPoint = document.getElementById("endPoint");
+    //             if (endPoint) {
+    //                 endPoint.previousSibling.remove();
+    //                 endPoint.remove();
+    //             }
+    //         }
+    //     })
+    //
+    // });
     popupContent.append(elements.createFormButton("Создать", {id: "createDevice"}));
 }
 

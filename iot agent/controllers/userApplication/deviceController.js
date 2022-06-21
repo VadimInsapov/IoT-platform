@@ -17,7 +17,7 @@ function CloseSocket(socketIoTAgent) {
         setTimeout(() => {
             socketIoTAgent.close();
             resolve();
-        }, 3000);
+        }, 2000);
     });
 }
 
@@ -42,16 +42,22 @@ async function PairingWithDevice(body) {
             initializationDataForDevice['serverAddress'] = `http://127.0.0.1:7896/iot?deviceId=${deviceId}`;
         }
     }
-
     socketIoTAgent.send(JSON.stringify(initializationDataForDevice), 8000, "255.255.255.255");
+    let addressDevice = "";
     socketIoTAgent.on('message', (msg, rinfo) => {
         console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+        if (protocol == "HTTP") {
+            if (commands) {
+                msg = JSON.parse(msg);
+                addressDevice = `${msg.host}:${msg.port}`
+            }
+        }
         gotMessageFromDevice = true;
     });
     socketIoTAgent.on('listening', () => {
     });
     await CloseSocket(socketIoTAgent);
-    return gotMessageFromDevice;
+    return {gotMessageFromDevice: gotMessageFromDevice, addressDeviceSocket: addressDevice};
 }
 
 exports.addDevice = function (mqttClient) {
@@ -63,11 +69,15 @@ exports.addDevice = function (mqttClient) {
         }
         try {
             const {deviceId, entityType, transport: protocol} = request.body;
-            const gotMessageFromDevice = PairingWithDevice(request.body);
-            if (!gotMessageFromDevice) {
-                response.status(400).send("The device wasn't found in local network!");
-                console.log("The device wasn't found in local network!");
-                return;
+            let addressDevice = "";
+            if(!IoTAgentDevice.find(deviceId)){
+                const {gotMessageFromDevice, addressDeviceSocket} = await PairingWithDevice(request.body);
+                addressDevice = addressDeviceSocket;
+                if (!gotMessageFromDevice) {
+                    response.status(400).send("The device wasn't found in local network!");
+                    console.log("The device wasn't found in local network!");
+                    return;
+                }
             }
             if (protocol === "MQTT") {
                 mqttClient.subscribe(`/${deviceId}/attributes`);
@@ -79,7 +89,7 @@ exports.addDevice = function (mqttClient) {
             if (!("entityName" in request.body)) {
                 request.body = {...request.body, entityName}
             }
-            const iotAgentDevice = new IoTAgentDevice(request.body);
+            const iotAgentDevice = new IoTAgentDevice(request.body, addressDevice);
             iotAgentDevice.save();
             logger.deviceWasMadeByUser(deviceId);
             logger.showAll(IoTAgentDevice);
@@ -100,12 +110,6 @@ exports.addDeviceByModel = function (mqttClient) {
         }
         const body = request.body;
         const modelAttributes = models.getAttributes(body.model);
-        if ("commands" in modelAttributes && modelAttributes.transport === "HTTP") {
-            if (!("endpoint" in body)) {
-                response.status(400).json(`Device with HTTP transport and commands must have endpoint\nThis model has these attributes!`)
-                return;
-            }
-        }
         delete body.model;
         const newBody = {
             ...body,
@@ -209,14 +213,7 @@ exports.validate = (method) => {
                     .not().isEmpty()
                     .withMessage('The transport is required')
                     .isIn(['HTTP', 'MQTT'])
-                    .withMessage('Wrong transport')
-                    .custom((protocol, {req}) => {
-                        if (protocol === "HTTP" && req.body.commands) {
-                            return req.body.endpoint;
-                        }
-                        return true;
-                    })
-                    .withMessage("Device with HTTP transport and commands must have endpoint"),
+                    .withMessage('Wrong transport'),
                 body(['dynamicAttributes', 'commands'])
                     .custom((value, {req}) => req.body.dynamicAttributes || req.body.commands)
                     .withMessage('At least dynamicAttributes or commands must exist'),

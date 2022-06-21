@@ -18,8 +18,9 @@ socketDevice.on('message', (message, serverInfo) => {
         return;
     }
     console.log(message);
-    socketDevice.send("Ok", serverInfo.port, serverInfo.address);
-    socketDevice.close();
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {
+        socketDevice.close();
+    });
 
     const client = mqtt.connect(message.brokerAddress);
     client.on('connect', () => {

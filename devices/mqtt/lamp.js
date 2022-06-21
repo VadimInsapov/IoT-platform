@@ -41,8 +41,9 @@ socketDevice.on('message', (message, serverInfo) => {
         return;
     }
     console.log(message);
-    socketDevice.send("Ok", serverInfo.port, serverInfo.address);
-    socketDevice.close();
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {
+        socketDevice.close();
+    });
     const mqttClient = mqtt.connect(message.brokerAddress);
     mqttClient.on('connect', () => {
         console.log("The Device connected successfully!");

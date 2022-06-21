@@ -19,8 +19,9 @@ socketDevice.on('message', (message, serverInfo) => {
         return;
     }
     console.log(message);
-    socketDevice.send("Ok", serverInfo.port, serverInfo.address);
-    socketDevice.close();
+    socketDevice.send(JSON.stringify(actuatorSettings), serverInfo.port, serverInfo.address, (err) => {
+        socketDevice.close();
+    });
 
     const app = express();
     app.post(deviceRoute, express.json(), function(request, response){

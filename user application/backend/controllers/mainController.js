@@ -19,15 +19,15 @@ hbs.registerHelper('isCommand', function (str) {
 exports.index = async function (request, response) {
     const {filterType = ""} = request.query;
     const rooms = await iotPlatform.getAllObjectsByType("Room");
-    let shortDevicesIds = await iotPlatform.getAllDevicesShortFormat();
-    shortDevicesIds = Object.values(shortDevicesIds);
+    let devices = await iotPlatform.getAllObjectsByType("Thermometer,Motion,Bell,Lamp,Door");
+    devices.map(item => delete item["__v"]);
+    let shortDevicesIds = devices.map(item => item["_id"]);
     const deviceTypes = getDeviceTypes(shortDevicesIds, filterType);
     if (filterType) {
-        shortDevicesIds = shortDevicesIds.filter(item => {
-            return item.split(":")[1] === filterType
+        devices = devices.filter(item => {
+            return item["_id"].split(":")[1] === filterType
         });
     }
-    const devices = await Promise.all(shortDevicesIds.map(async (deviceId) => await iotPlatform.getObjectById(deviceId)));
     await expandDeviceInfo(devices);
     // console.log(devices);
     const shortRooms = rooms.map(item => ({

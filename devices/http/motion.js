@@ -47,8 +47,9 @@ socketDevice.on('message', (message, serverInfo) => {
         return;
     }
     iotAgentEndpoint = message.serverAddress;
-    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {});
-    socketDevice.close();
+    socketDevice.send("Ok", serverInfo.port, serverInfo.address, (err) => {
+        socketDevice.close();
+    });
 });
 socketDevice.on('listening', () => {
     socketDevice.setBroadcast(true);
