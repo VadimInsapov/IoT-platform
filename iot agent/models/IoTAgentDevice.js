@@ -78,7 +78,7 @@ module.exports = class IoTAgentDevice {
         a["protocol"] = protocol;
         if (dynamicAttributes.length !== 0) a["attributes"] = this.getAttributes(dynamicAttributes);
         if (commands.length !== 0) a["commands"] = this.getCommands(commands);
-        if (httpActuatorSettings !== "") {
+        if (httpActuatorSettings !== "" && protocol !== "MQTT") {
             const {route, method} = httpActuatorSettings;
             a["httpActuatorSettings"] = {
                 URL: `http://${addressDevice}${route}`,

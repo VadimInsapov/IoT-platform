@@ -4,10 +4,9 @@ const IoTAgentDevice = require("../../../models/IoTAgentDevice.js");
 const mongoose = require("mongoose");
 const objectScheme = require("../../../models/ObjectScheme");
 const sendIdAndAttributesToBroker = require("../sendIdAndAttributesToBroker");
-const parseMessage = (message) => JSON.parse(message);
 exports.matchFromDevicesAndSendDataToDB = (topic, message) => {
     const deviceId = topic.split('/')[1];
-    const mqttClientAttributes = parseMessage(message);
+    const mqttClientAttributes = JSON.parse(message);
     logger.got("mqtt-client", deviceId, mqttClientAttributes);
     const iotAgentDeviceValue = IoTAgentDevice.find(deviceId);
     const brokerId = matcherDB.getBrokerId(iotAgentDeviceValue);

@@ -33,8 +33,9 @@ socketDevice.on('message', (message, serverInfo) => {
         console.log("The Device connected successfully!")
     })
     setInterval(() => {
-        client.publish(message.topicAttributes, JSON.stringify(thermometerFunctions.getMessage()))
-        console.log(`${message.topicAttributes} -m ${JSON.stringify(thermometerFunctions.getMessage())}`);
+        const newData = thermometerFunctions.getMessage();
+        client.publish(message.topicAttributes, JSON.stringify(newData))
+        console.log(`${message.topicAttributes} -m ${JSON.stringify(newData)}`);
     }, ms)
 });
 socketDevice.on('listening', () => {
@@ -42,7 +43,7 @@ socketDevice.on('listening', () => {
     console.log(`server listening ${socketDevice.address().address}:${socketDevice.address().port}`);
 });
 socketDevice.bind({
-    port: 8000,
+    port: 1883,
 });
 
 const fullDeviceInfo = infoDevice.getDevice(shortDeviceInfo);

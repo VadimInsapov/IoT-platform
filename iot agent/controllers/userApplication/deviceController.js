@@ -12,54 +12,6 @@ const sendResponseWithErrors = (response, errors) => response.status(400).json({
 const clientSocket = dgram.createSocket("udp4");
 clientSocket.bind(() => clientSocket.setBroadcast(true));
 
-function CloseSocket(socketIoTAgent) {
-    return new Promise((resolve, reject) => {
-        setTimeout(() => {
-            socketIoTAgent.close();
-            resolve();
-        }, 2000);
-    });
-}
-
-async function PairingWithDevice(body) {
-    const {deviceId, entityType, transport: protocol, dynamicAttributes = "", commands = ""} = body;
-    const socketIoTAgent = dgram.createSocket("udp4");
-    socketIoTAgent.bind(() => socketIoTAgent.setBroadcast(true));
-    let gotMessageFromDevice = false;
-    const initializationDataForDevice = {};
-    initializationDataForDevice['deviceId'] = deviceId;
-    if (protocol == "MQTT") {
-        initializationDataForDevice['brokerAddress'] = `mqtt://${global.mqttBrokerAddress}:1883`;
-        if (dynamicAttributes) {
-            initializationDataForDevice['topicAttributes'] = `/${deviceId}/attributes`;
-        }
-        if (commands) {
-            initializationDataForDevice['topicCommands'] = `/${deviceId}/commands`;
-        }
-    }
-    if (protocol == "HTTP") {
-        if (dynamicAttributes) {
-            initializationDataForDevice['serverAddress'] = `http://127.0.0.1:7896/iot?deviceId=${deviceId}`;
-        }
-    }
-    socketIoTAgent.send(JSON.stringify(initializationDataForDevice), 8000, "255.255.255.255");
-    let addressDevice = "";
-    socketIoTAgent.on('message', (msg, rinfo) => {
-        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
-        if (protocol == "HTTP") {
-            if (commands) {
-                msg = JSON.parse(msg);
-                addressDevice = `${msg.host}:${msg.port}`
-            }
-        }
-        gotMessageFromDevice = true;
-    });
-    socketIoTAgent.on('listening', () => {
-    });
-    await CloseSocket(socketIoTAgent);
-    return {gotMessageFromDevice: gotMessageFromDevice, addressDeviceSocket: addressDevice};
-}
-
 exports.addDevice = function (mqttClient) {
     return async function (request, response) {
         const errors = validationResult(request);
@@ -100,6 +52,57 @@ exports.addDevice = function (mqttClient) {
         }
     }
 };
+
+async function PairingWithDevice(body) {
+    const {deviceId, entityType, transport: protocol, dynamicAttributes = "", commands = ""} = body;
+    const socketIoTAgent = dgram.createSocket("udp4");
+    socketIoTAgent.bind(() => socketIoTAgent.setBroadcast(true));
+    let gotMessageFromDevice = false;
+    const initializationDataForDevice = {};
+    initializationDataForDevice['deviceId'] = deviceId;
+    let PORT = "";
+    if (protocol == "MQTT") {
+        PORT = 1883;
+        initializationDataForDevice['brokerAddress'] = `mqtt://${global.mqttBrokerAddress}:1883`;
+        if (dynamicAttributes) {
+            initializationDataForDevice['topicAttributes'] = `/${deviceId}/attributes`;
+        }
+        if (commands) {
+            initializationDataForDevice['topicCommands'] = `/${deviceId}/commands`;
+        }
+    }
+    if (protocol == "HTTP") {
+        PORT = 80;
+        if (dynamicAttributes) {
+            initializationDataForDevice['serverAddress'] = `http://127.0.0.1:7896/iot?deviceId=${deviceId}`;
+        }
+    }
+    socketIoTAgent.send(JSON.stringify(initializationDataForDevice), PORT, "255.255.255.255");
+    let addressDevice = "";
+    socketIoTAgent.on('message', (msg, rinfo) => {
+        console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+        if (protocol == "HTTP") {
+            if (commands) {
+                msg = JSON.parse(msg);
+                addressDevice = `${msg.host}:${msg.port}`
+            }
+        }
+        gotMessageFromDevice = true;
+    });
+    socketIoTAgent.on('listening', () => {
+    });
+    await CloseSocket(socketIoTAgent);
+    return {gotMessageFromDevice: gotMessageFromDevice, addressDeviceSocket: addressDevice};
+}
+
+function CloseSocket(socketIoTAgent) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            socketIoTAgent.close();
+            resolve();
+        }, 2000);
+    });
+}
 
 exports.addDeviceByModel = function (mqttClient) {
     return function (request, response) {
