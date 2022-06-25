@@ -21,7 +21,6 @@ buttonEditRoom.addEventListener("click", async (e) => {
     console.log(room);
     popupContent.append(elements.createFormTitle("Редактировать комнату"));
     popupContent.append(elements.createInput("Название", room.roomName.value, {id: "roomName"}));
-    popupContent.append(elements.createInput("Описание", room.roomDescription.value, {id: "roomDescription"}))
     popupContent.append(elements.createFormButton("Редактировать", {id: "editRoom"}));
 });
 popupCloseIcon.addEventListener("click", (e) => {
@@ -55,15 +54,10 @@ document.addEventListener("click", async (e) => {
     }
     if (idElement === "editRoom") {
         const roomName = document.getElementById("roomName").value;
-        const roomDescription = document.getElementById("roomDescription").value;
         const object = {
             "roomName": {
                 type: "text",
                 value: roomName,
-            },
-            "roomDescription": {
-                type: "text",
-                value: roomDescription,
             }
         };
         await makeRequest(`/api/rooms/${roomId}/edit`, "POST", object);

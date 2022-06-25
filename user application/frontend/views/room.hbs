@@ -24,7 +24,10 @@
         <div class="room-info p-5  rounded-3  border border-secondary border-2 ">
             <div class="fs-3 text-center mb-3">Описание</div>
             <ul class="list-group mb-2">
-                <li class="list-group-item fs-6">{{room.roomDescription.value}}</li>
+                <li class="list-group-item fs-6">Количество устройств в комнате: {{countDevices}}</li>
+                {{#each devicesTypes}}
+                    <li class="list-group-item fs-6">{{@key}} - {{this}}</li>
+                {{/each}}
             </ul>
             <div class="text-center">
                 <button id="addDevice" type="button" class="btn btn-primary">Добавить устройство</button>

@@ -5,9 +5,15 @@ exports.index = async function (request, response) {
     const room = await iotPlatform.getObjectById(roomId);
     const roomDevices = await iotPlatform.getParentObjectById(roomId);
     await expandDeviceInfo(roomDevices);
+    const devicesTypes = roomDevices.reduce(function(acc, el) {
+        acc[el.type] = (acc[el.type] || 0) + 1;
+        return acc;
+    }, {});
     response.render("room.hbs", {
         room: room,
         devices: roomDevices,
+        devicesTypes: devicesTypes,
+        countDevices: roomDevices.length
     });
 };
 exports.getRoom = async function (request, response) {
@@ -23,7 +29,7 @@ exports.storeRoom = async function (request, response) {
     try {
         console.log(request.body)
         await iotPlatform.postObjectInBroker(request.body);
-        response.redirect().status(200);
+        response.redirect();
     } catch (err) {
         if (err) console.log(err)
     }

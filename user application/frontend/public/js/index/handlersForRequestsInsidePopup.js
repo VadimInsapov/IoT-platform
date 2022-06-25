@@ -23,7 +23,7 @@ export async function handleCreateDevice(e) {
 
 export async function handleCreateRoom(e) {
     const roomName = document.getElementById("roomName").value;
-    const roomDescription = document.getElementById("roomDescription").value;
+    console.log(roomName);
     const room = {
         "type": "room",
         "attributes": [
@@ -32,10 +32,10 @@ export async function handleCreateRoom(e) {
                     "type": "text",
                     "value": roomName
                 },
-                "roomDescription": {
-                    "type": "text",
-                    "value": roomDescription
-                },
+                // "roomDescription": {
+                //     "type": "text",
+                //     "value": roomDescription
+                // },
             }
         ]
     }
