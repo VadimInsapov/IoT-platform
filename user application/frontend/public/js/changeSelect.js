@@ -1,6 +1,7 @@
 import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
 
+// Список атрибутов в зависимости от типа устройств для условий
 export function changeSelectType() {
 	const popupContent = popupFunctions.openPopup();
 	if (document.getElementById("attribute")) {
@@ -37,6 +38,7 @@ export function changeSelectType() {
 	));
 }
 
+// Список условий в зависимости от атрибутов для условий
 export function changeSelectAttribute() {
 	const popupContent = popupFunctions.openPopup();
 	clearCondition()
@@ -70,6 +72,7 @@ export function changeSelectAttribute() {
 	popupContent.append(elements.createFormButton("Добавить", { id: "addTypeCondition" }));
 }
 
+// Список атрибутов в зависимости от типа устройства для условий
 export function changeSelectDevice() {
 	const popupContent = popupFunctions.openPopup();
 	if (document.getElementById("attribute")) {
@@ -103,6 +106,7 @@ export function changeSelectDevice() {
 	));
 }
 
+// Стирание выпадающих списков для условий
 function clearCondition() {
 	if (document.getElementById("condition")) {
 		document.getElementById("condition").remove()
@@ -115,6 +119,7 @@ function clearCondition() {
 	}
 }
 
+// Список атрибутов в зависимости от типа устройств для исполнителей
 export function changeSelectTypeHandler() {
 	const popupContent = popupFunctions.openPopup();
 	clearHandler()
@@ -141,6 +146,7 @@ export function changeSelectTypeHandler() {
 	popupContent.append(elements.createFormButton("Добавить", { id: "addHandler" }));
 }
 
+// Список состояний в зависимости от типа устройства для исполнителей
 export function changeSelectDeviceHandler() {
 	const popupContent = popupFunctions.openPopup();
 	clearHandler()
@@ -168,6 +174,7 @@ export function changeSelectDeviceHandler() {
 	popupContent.append(elements.createFormButton("Добавить", { id: "addHandler" }));
 }
 
+// Стирание выпадающих списков для исполнителей
 function clearHandler() {
 	if (document.getElementById("command")) {
 		document.getElementById("command").remove()

@@ -1,5 +1,6 @@
 const { body } = require('express-validator/check');
 
+// Проверка входных данных при создании атрибутов
 exports.validate = [
 	body('*.value')
 		.not().isEmpty().withMessage('attribute value is required'),

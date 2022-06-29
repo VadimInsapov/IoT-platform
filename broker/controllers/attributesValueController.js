@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 const checkSubscriptions = require('../subs/checkSubs.js')
 
 class AttributeValueController {
+	// GET /iot/entities/:id/attrs/:name/value
+	// Получение значения атрибута объекта
 	async getAttributeValue(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -14,6 +16,8 @@ class AttributeValueController {
 		}
 	}
 
+	// PUT /iot/entities/:id/attrs/:name/value
+	// Обновление значения атрибута объекта
 	async updateAttributeValue(req, res) {
 		try {
 			const { value } = req.body;

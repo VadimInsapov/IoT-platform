@@ -3,21 +3,20 @@ const CronJob = require('cron').CronJob;
 const fetch = require('node-fetch');
 const checkCondition = require('./checkCondition')
 
+// Создание подписки по времени
 function CreateTimeSub(time_sub) {
 	for (let time of time_sub.time) {
-		console.log(time)
 		const job = new CronJob(`0 ${time["minute"]} ${time["hour"]} * * ${time["days"]}`, () => CheckTimeSub(time_sub), 'Asia/Yekaterinburg');
 		job.start();
 	}
-	//CheckTimeSub(time_sub)
 }
 
+// Проверка подписки по времени
 async function CheckTimeSub(time_sub) {
 	let true_condition = true
-	//console.log(Object.keys(time_sub["subject"]).length!=0)
+	// Проверка состояния объектов
 	if (time_sub.hasOwnProperty('subject')) {
 		if (Object.keys(time_sub["subject"]).length!=0) {
-			//console.log("a")
 			let bools_subs = new Array()
 			const logical = /(&&|\|\||\(|\))/
 			const symbols = /(<=|>=|!=|>|<|=)/
@@ -59,9 +58,8 @@ async function CheckTimeSub(time_sub) {
 			true_condition = eval(fullCondition.join(''))
 		}
 	}
-	//let handler_sended = true
+	// Отправка команд
 	if (time_sub.hasOwnProperty('handler') && true_condition) {
-		//console.log(time_sub)
 		for (let handler of time_sub.handler) {
 			const idPattern = new RegExp(handler.id)
 			let probably_handlers = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=${handler["id"].split(":")[1]}`).then(response => {
@@ -69,16 +67,10 @@ async function CheckTimeSub(time_sub) {
 			})
 			for (let hand of probably_handlers) {
 				if (idPattern.test(hand._id)) {
-					// let handler_status = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${hand._id}/attrs/status`).then(response => {
-					// 	return response.json()
-					// })
-					//console.log(handler_status)
-					// if (handler_status.value != handler.command) {
 						handler_sended = true
 						let data = {}
 						data["id"] = hand._id
 						data["command"] = handler.command
-						//console.log(data)
 						const handler_response = await fetch(`http://${process.env.LOCALHOST}:${process.env.COMMAND_PORT}/update`, {
 							method: "POST",
 							headers: {
@@ -88,23 +80,15 @@ async function CheckTimeSub(time_sub) {
 						}).then(response => {
 							return response.json()
 						})
-						//console.log(handler_response)
-					// }
-					// else handler_sended = false
-					//console.log(handler_sended)
 				}
 			}
 		}
 	}
-	//console.log(true_condition)
-	//console.log(handler_sended)
-
+	// Отправка уведомлений
 	if (time_sub.hasOwnProperty('notification') && true_condition) {
-		//console.log(time_sub)
 		let data = {}
 		data["idSub"] = time_sub._id
 		if (time_sub.hasOwnProperty("description")) data["nameSub"] = time_sub.description
-		//console.log(data)
 		const notification_response = await fetch(time_sub.notification.url, {
 			method: "POST",
 			headers: {

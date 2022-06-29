@@ -5,10 +5,7 @@ const typesRouter = require('./typesRoute')
 const subscriptionsRouter = require('./subscriptionsRoute')
 const agentRouter = require('./agentRoute')
 
-router.get('/', function (req, res) {
-  res.send('entry point get');
-});
-
+// Маршруты
 router.use("/entities", entitiesRouter);
 router.use("/types", typesRouter);
 router.use("/subscriptions", subscriptionsRouter);

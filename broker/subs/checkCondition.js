@@ -1,3 +1,4 @@
+// Проверка условий в подписках
 async function checkCondition(condition, changes) {
 	let checked_attr = {}
 	if (!Object.keys(changes).includes(condition[0])) {

@@ -1,5 +1,6 @@
 const { body } = require('express-validator/check');
 
+// Проверка входных данных при создании подписки
 exports.validate = [
 	body('description')
 		.optional({ checkFalsy: true }),
@@ -16,23 +17,3 @@ exports.validate = [
 	body('notification')
 		.optional({ checkFalsy: true }),
 ]
-
-/**
- * "description",
- * "time"
- * "subject": [
- * 		{
- * 			"idPattern",
- * 			"typePattern",
- * 			"attrs": [],
- * 			"condition"
- * 		}
- * 	],
- * "handler": {  
- * 	"id",
- * 	"command"
- * },
- * "notification": { 
- * 	"url"
- * }
- */

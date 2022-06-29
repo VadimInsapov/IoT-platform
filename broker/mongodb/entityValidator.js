@@ -1,5 +1,6 @@
 const { body } = require('express-validator/check');
 
+// Проверка входных данных при создании объекта
 exports.validate = [
 	body('type')
 		.not().isEmpty()
