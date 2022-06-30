@@ -11,7 +11,7 @@ const sendResponseWithErrors = (response, errors) => response.status(400).json({
 
 const clientSocket = dgram.createSocket("udp4");
 clientSocket.bind(() => clientSocket.setBroadcast(true));
-
+//Добавление устройства в платформу
 exports.addDevice = function (mqttClient) {
     return async function (request, response) {
         const errors = validationResult(request);
@@ -103,7 +103,7 @@ function CloseSocket(socketIoTAgent) {
         }, 2000);
     });
 }
-
+//Добавление устройства в платформу через модели
 exports.addDeviceByModel = function (mqttClient) {
     return function (request, response) {
         const errors = validationResult(request);

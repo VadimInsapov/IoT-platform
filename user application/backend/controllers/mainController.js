@@ -16,6 +16,7 @@ hbs.registerHelper('myFunc', function (a, b) {
 hbs.registerHelper('isCommand', function (str) {
     return str === "command";
 });
+//контроллер для работы с главной страницей
 exports.index = async function (request, response) {
     const {filterType = ""} = request.query;
     const rooms = await iotPlatform.getAllObjectsByType("Room");

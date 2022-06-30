@@ -2,8 +2,6 @@ const axios = require('axios').default;
 exports.sendHttpCommand = (httpActuatorSettings, command, responseForBroker) => {
     const message = {}
     message['command'] = command;
-    console.log(httpActuatorSettings)
-
     axios({
         method: httpActuatorSettings.method,
         url: httpActuatorSettings.URL,

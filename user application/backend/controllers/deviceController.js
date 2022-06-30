@@ -1,4 +1,5 @@
 const iotPlatform = require("./iotPlatformFunctions");
+// контроллер по работе с устройствами
 exports.index = async function (request, response) {
     try {
         let shortDevicesIds = await iotPlatform.getAllDevicesShortFormat();

@@ -1,5 +1,6 @@
 const iotPlatform = require("./iotPlatformFunctions");
 const entities = require("../entities");
+//контроллер по работе с комнатой
 exports.index = async function (request, response) {
     const {roomId} = request.params;
     const room = await iotPlatform.getObjectById(roomId);

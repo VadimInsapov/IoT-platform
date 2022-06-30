@@ -4,7 +4,7 @@ const sendIdAndAttributesToBroker = require("../sendIdAndAttributesToBroker");
 const logger = require("../../logger");
 const mongoose = require("mongoose");
 const objectScheme = require("../../../models/ObjectScheme");
-
+//HTTP протокол северное направление
 exports.matchFromDevicesAndSendDataToDB = (request, response) => {
     const deviceId = request.query.deviceId;
     const httpClientAttributes = request.body;

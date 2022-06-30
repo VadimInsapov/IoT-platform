@@ -1,5 +1,6 @@
 exports.getAttributes = (model) => models[model.toLowerCase()];
 exports.include = (model) => model.toLowerCase() in models;
+//заготовленные модели устройств
 const models = {
     sthm: {
         "entityType": "Thermometer",

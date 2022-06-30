@@ -4,6 +4,7 @@ const IoTAgentDevice = require("../../../models/IoTAgentDevice.js");
 const mongoose = require("mongoose");
 const objectScheme = require("../../../models/ObjectScheme");
 const sendIdAndAttributesToBroker = require("../sendIdAndAttributesToBroker");
+//MQTT протокол северное направление
 exports.matchFromDevicesAndSendDataToDB = (topic, message) => {
     const deviceId = topic.split('/')[1];
     const mqttClientAttributes = JSON.parse(message);

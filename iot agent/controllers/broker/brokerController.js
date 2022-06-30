@@ -1,5 +1,6 @@
 const Device = require('../../models/IoTAgentDevice');
 const senderCommands = require('./senderCommands');
+//Южное направление
 exports.updateState = function (mqttClient) {
     return function (request, response) {
         const {id: entityName, command} = request.body;

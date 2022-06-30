@@ -1,5 +1,5 @@
 const { default: axios } = require("axios");
-
+//запросы к платформе
 exports.updateCommandInAgent = (object) => {
     return axios({
         method: "post",
