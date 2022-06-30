@@ -7,6 +7,8 @@ const checkSubscriptions = require('../subs/checkSubs.js')
 const fetch = require('node-fetch');
 
 class EntitiesController {
+	// GET /iot/entities
+	// Получение всех объектов
 	async getAllEntities(req, res) {
 		try {
 			let collection_names = new Array()
@@ -43,6 +45,8 @@ class EntitiesController {
 		}
 	}
 
+	// POST /iot/entities
+	// Создание объекта
 	async createEntity(req, res, next) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -89,6 +93,8 @@ class EntitiesController {
 		}
 	}
 
+	// GET /iot/entities/:id
+	// Получение информации об объекте
 	async getEntity(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -100,11 +106,12 @@ class EntitiesController {
 			const entity = await EntityModel.findById(req.params.id, '-__v')
 			return res.json(entity)
 		} catch (e) {
-			console.log(e)
 			res.send(`entities id=${req.params.id} ${req.method} error`);
 		}
 	}
 
+	// DELETE /iot/entities/:id
+	// Удаление объекта
 	async deleteEntity(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -116,6 +123,8 @@ class EntitiesController {
 		}
 	}
 
+	// GET /iot/entities/:id/attrs
+	// Получение всех атрибутов объекта
 	async getEntityAttributes(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -127,6 +136,8 @@ class EntitiesController {
 		}
 	}
 
+	// PUT /iot/entities/:id/attrs
+	// Замена всех атрибутов объекта
 	async replaceAllEntityAttributes(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -147,6 +158,8 @@ class EntitiesController {
 		}
 	}
 
+	// POST /iot/entities/:id/attrs
+	// Обновление или добавление атрибутов
 	async updateOrAppendEntityAttributes(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -168,6 +181,8 @@ class EntitiesController {
 		}
 	}
 
+	// PATCH /iot/entities/:id/attrs
+	// Обновление существующих атрибутов
 	async updateExistingEntityAttributes(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -191,6 +206,8 @@ class EntitiesController {
 		}
 	}
 
+	// GET /iot/entities/:id/relationships
+	// Получение связанных объектов
 	async getRelationships(req, res) {
 		let attributes = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities/${req.params.id}/attrs`).then(response => {
 			return response.json()

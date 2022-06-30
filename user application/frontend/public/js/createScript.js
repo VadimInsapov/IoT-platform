@@ -2,7 +2,6 @@ import * as elements from "./elementsForPopup.js";
 import * as popupFunctions from "./popupFunctions.js";
 import { makeRequest } from "./index/makeRequest.js";
 
-//const buttonAddCondition = document.getElementById("addCondition");
 const buttonAddCommand = document.getElementById("addCommand");
 const buttonCreateSub = document.getElementById("createSub")
 const buttonAddConditionBlock = document.getElementById("addConditionBlock")
@@ -14,15 +13,8 @@ const script = {
     conditions: [[]],
     handlers: [],
 }
-// buttonAddCondition.addEventListener("click", (e) => {
-//     const popupContent = popupFunctions.openPopup();
-//     popupContent.append(elements.createFormTitle("Условие"));
-//     popupContent.append(elements.createFormButton("Время", { classNames: ['mb-3'], id: "timeCondition" }));
-//     popupContent.append(elements.createFormButton("Данные устройства", { id: "deviceCondition" }));
-//     current_block = 1
-//     console.log(current_block)
-// });
 
+// Событие нажатия на кнопку добавления исполнителя
 buttonAddCommand.addEventListener("click", (e) => {
     const popupContent = popupFunctions.openPopup();
     popupContent.append(elements.createFormTitle("Исполнитель"));
@@ -34,14 +26,15 @@ buttonAddCommand.addEventListener("click", (e) => {
 });
 
 document.addEventListener("click", async (e) => {
+    // Событие нажатия на кнопку добавления условия времени
     if (e.target && e.target.id == 'timeCondition') {
-        //popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
         popupContent.append(elements.createFormTitle("Условие: время"));
         popupContent.append(elements.createDaysCheckboxs())
         popupContent.append(elements.createInput("", "", { type: "time", id: "valueTimeCondition" }));
         popupContent.append(elements.createFormButton("Добавить", { id: "addTimeCondition" }));
     }
+    // Событие нажатия на кнопку добавления условия
     if (e.target && e.target.id == 'deviceCondition') {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
@@ -54,6 +47,7 @@ document.addEventListener("click", async (e) => {
         current_block = 1
         console.log(current_block)
     }
+    // Событие нажатия на кнопку добавления условия для всех устройств одного типа
     if (e.target && e.target.id == 'typeCondition') {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
@@ -63,6 +57,7 @@ document.addEventListener("click", async (e) => {
             [{ value: "Thermometer", text: "Термометры" }, { value: "Motion", text: "Датчики движения" }, { value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }],
             { id: "type" }));
     }
+    // Событие нажатия на кнопку добавления условия для определенного устройства
     if (e.target && e.target.id == 'defDeviceCondition') {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
@@ -76,6 +71,7 @@ document.addEventListener("click", async (e) => {
         }
         popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "device" }));
     }
+    // Добавление условия времени
     if (e.target && e.target.id == 'addTimeCondition') {
         const days = document.getElementsByClassName("daysOfWeek")
         let name_days = ""
@@ -104,6 +100,7 @@ document.addEventListener("click", async (e) => {
         popupFunctions.closePopup(e);
         drawTimeCondition(cond)
     }
+    // Добавление условия
     if (e.target && e.target.id == 'addTypeCondition') {
         let cond = {}
         cond["type"] = "subject"
@@ -132,6 +129,7 @@ document.addEventListener("click", async (e) => {
         popupFunctions.closePopup(e);
         drawCondition(cond)
     }
+    // Событие нажатия на кнопку добавления исполнителей одного типа
     if (e.target && e.target.id == 'typeHandler') {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
@@ -141,6 +139,7 @@ document.addEventListener("click", async (e) => {
             [{ value: "Door", text: "Двери" }, { value: "Lamp", text: "Лампы" }, { value: "Bell", text: "Звонки" }],
             { id: "handlerType" }));
     }
+    // Событие нажатия на кнопку добавления определенного устройства-исполнителя
     if (e.target && e.target.id == 'deviceHandler') {
         popupFunctions.closePopup(e);
         const popupContent = popupFunctions.openPopup();
@@ -154,6 +153,7 @@ document.addEventListener("click", async (e) => {
         }
         popupContent.append(elements.createSelect("Выбрать устройство", selectDevices, { id: "defDeviceHandler" }));
     }
+    // Добавление исполнителя
     if (e.target && e.target.id == 'addHandler') {
         let hand = {}
         if (document.getElementById("handlerType")) {
@@ -178,6 +178,7 @@ popupCloseIcon.addEventListener("click", (e) => {
     popupFunctions.closePopup(e)
 });
 
+// Создание подписки
 buttonCreateSub.onclick = async (event) => {
     event.stopPropagation();
     let counter = 0
@@ -231,11 +232,13 @@ buttonCreateSub.onclick = async (event) => {
     window.location.href = '/scripts'
 }
 
+// Событие нажатия на кнопку добавления набора условий
 buttonAddConditionBlock.onclick = (event) => {
     drawConditionBlock()
     script.conditions.push(new Array())
 }
 
+// Отрисовка условия времени
 function drawTimeCondition(time) {
     let conditionList = document.getElementById("timeList")
     let ul_condition = document.createElement("ul")
@@ -256,6 +259,7 @@ function drawTimeCondition(time) {
     conditionList.appendChild(ul_condition)
 }
 
+// Удаление условия времени
 const deleteTimeCondition = (e) => {
     const button = e.target
     for (let cond of script.time) {
@@ -268,7 +272,7 @@ const deleteTimeCondition = (e) => {
     }
 }
 
-
+// Отрисовка условия
 function drawCondition(condition) {
     let block = document.getElementById(`${current_block}`)
     let conditionList = {}
@@ -302,6 +306,7 @@ function drawCondition(condition) {
     conditionList.appendChild(ul_condition)
 }
 
+// Удаление условия
 const deleteCondition = (e) => {
     const button = e.target
     for (let cond_array of script.conditions) {
@@ -316,6 +321,7 @@ const deleteCondition = (e) => {
     }
 }
 
+// Отрисовка исполнителя
 function drawHandler(handler) {
     let handlersList = document.getElementById("handlersList")
     let ul_handler = document.createElement("ul")
@@ -336,6 +342,7 @@ function drawHandler(handler) {
     handlersList.appendChild(ul_handler)
 }
 
+// Удаление исполнителя
 const deleteHandler = (e) => {
     const button = e.target
     for (let hand of script.handlers) {
@@ -348,6 +355,7 @@ const deleteHandler = (e) => {
     }
 }
 
+// Отрисовка набора условий
 function drawConditionBlock() {
     let block = document.createElement('div')
     block.id = `${block_num}`

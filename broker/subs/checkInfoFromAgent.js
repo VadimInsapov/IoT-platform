@@ -2,6 +2,7 @@ require('dotenv').config()
 const fetch = require('node-fetch');
 const checkSubscriptions = require('../subs/checkSubs.js')
 
+// Проверка изменений в устройствах
 async function checkInfoFromAgent(deviceChanges) {
 	let changes = {}
 	changes["_id"] = deviceChanges.id

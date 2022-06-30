@@ -1,6 +1,7 @@
 import { makeRequest } from "./index/makeRequest.js";
 import {socketScript} from "./indexAndRoomCommon.js";
 
+// Добавление событий для кнопок редактирования и удаление сценариев
 const scripts = document.getElementsByClassName("script");
 for (const script of scripts) {
     const buttonEditScript = script.getElementsByClassName("script__button-edit")[0]

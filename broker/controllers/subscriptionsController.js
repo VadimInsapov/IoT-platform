@@ -7,6 +7,8 @@ const CreateTimeSub = require('../subs/timeSubs');
 const fetch = require('node-fetch');
 
 class SubscriptionsController {
+	// GET /iot/subscriptions
+	// Получение всех подписок
 	async getAllSubscriptions(req, res) {
 		let subs = await fetch(`http://${process.env.LOCALHOST}:${process.env.PORT}/iot/entities?type=time_subs,sub`).then(response => {
 			return response.json()
@@ -16,6 +18,8 @@ class SubscriptionsController {
 		res.send(`subscriptions ${req.method} error`);
 	}
 
+	// POST /iot/subscriptions
+	// Создание подписки
 	async createSubscription(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -67,6 +71,8 @@ class SubscriptionsController {
 		}
 	}
 
+	// GET /iot/subscriptions/:id
+	// Получение информации о подписке
 	async getSubscription(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -76,14 +82,14 @@ class SubscriptionsController {
 			else
 				SubscriptionModel = mongoose.model(type, SubscriptionSchema)
 			const sub = await SubscriptionModel.findById(req.params.id, '-__v')
-			console.log(sub)
 			return res.json(sub)
 		} catch (e) {
-			console.log(e)
 			res.send(`subscriptions id=${req.params.id} ${req.method} error`);
 		}
 	}
 
+	// DELETE /iot/subscriptions/:id
+	// Удаление подписки
 	async deleteSubscription(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -99,6 +105,8 @@ class SubscriptionsController {
 		}
 	}
 
+	// PATCH /iot/subscriptions/:id
+	// Обновление подписки
 	async updateSubscription(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {

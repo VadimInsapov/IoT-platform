@@ -6,6 +6,8 @@ const checkSubscriptions = require('../subs/checkSubs.js')
 
 
 class AtributesController {
+	// GET /iot/entities/:id/attrs/:name
+	// Получение данных атрибута объекта
 	async getAttributeData(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];
@@ -18,6 +20,8 @@ class AtributesController {
 		}
 	}
 
+	// POST /iot/entities/:id/attrs/:name
+	// Обновление данных атрибута объекта
 	async updateAttributeData(req, res) {
 		const errors = validationResult(req);
 		if (!errors.isEmpty()) {
@@ -67,6 +71,8 @@ class AtributesController {
 		}
 	}
 
+	// DELETE /iot/entities/:id/attrs/:name
+	// Удаление атрибута объекта
 	async deleteAttribute(req, res) {
 		try {
 			const type = req.params.id.split(':')[1];

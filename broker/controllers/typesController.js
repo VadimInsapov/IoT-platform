@@ -3,6 +3,8 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient(`mongodb://${process.env.LOCALHOST}`);
 
 class TypesController {
+	// GET /iot/types
+	// Получение списка существующих типов
 	async getAllTypes(req, res) {
 		try {
 			client.connect().then(client =>

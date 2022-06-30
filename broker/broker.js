@@ -15,6 +15,7 @@ broker.use(cors())
 broker.use(expressValidator())
 broker.use('/iot', router)
 
+// Запуск брокера
 const start = async ()=>{
 	try{
 		await mongoose.connect(DB, { useUnifiedTopology: true }) 
