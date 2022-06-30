@@ -1,4 +1,4 @@
-const IoTAgentDevices = new Map();
+const IoTAgentDevices = new Map();//Структура значимых атрибутов IoT устройств
 
 module.exports = class IoTAgentDevice {
     constructor(body, addressDevice) {
@@ -104,16 +104,3 @@ module.exports = class IoTAgentDevice {
         return attributes;
     }
 }
-// let a = {
-//     "motion001": {
-//         entityName: "broker:Motion:001",
-//         attributes: {
-//             c: {
-//                 type: "number",
-//                 name: "count"
-//             }
-//         }
-//         commands: [ring]
-//         endpoint: "http://"
-//     }
-// };

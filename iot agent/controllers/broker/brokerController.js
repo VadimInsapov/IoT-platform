@@ -22,7 +22,3 @@ exports.updateState = function (mqttClient) {
         }
     }
 };
-// {
-//     id:"broker:Bell:001",
-//     command:"ring"
-// }
